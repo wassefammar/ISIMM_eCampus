@@ -1,10 +1,13 @@
 <?php
 
 use Illuminate\Http\Request;
+use App\Models\ClassDocument;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\LoginController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\EnseignantController;
+use App\Http\Controllers\ClassDocumentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,21 +24,26 @@ use App\Http\Controllers\EnseignantController;
     return $request->user();
 }); */
 
-Route::post('register_etudiant',[StudentController::class, 'register']);
-Route::post('login_etudiant',[StudentController::class, 'login']);
-
 Route::post('register_enseignant',[EnseignantController::class, 'register']);
-Route::post('login_enseignant',[EnseignantController::class, 'login']);
-
+Route::post('register_etudiant',[StudentController::class, 'register']);
 Route::post('register_admin',[AdminController::class, 'register']);
-Route::post('login_admin',[AdminController::class, 'login']);
+Route::post('login',[LoginController::class, 'login']);
+Route::post('logout',[LoginController::class, 'logout'])->middleware('auth:sanctum');
+
+Route::get('students',[StudentController::class, 'fiit']);
+Route::get('download', [ClassDocumentController::class, 'download'])->middleware('auth:sanctum');
+Route::apiResource('upload_file',ClassDocumentController::class)->only('store')->middleware('auth:sanctum');
+
+
+
+
+
 
 
 /****Groupe des apis liées aux etudiants */
  Route::group(['middleware'=>['auth:sanctum']], function(){
    Route::get('etudiant', [StudentController::class, 'user']);
    Route::post('update_etudiant', [StudentController::class, 'update']);
-   Route::post('logout_etudiant', [StudentController::class, 'logout']);
 
 }); 
 
@@ -44,7 +52,6 @@ Route::post('login_admin',[AdminController::class, 'login']);
  Route::group(['middleware'=>['auth:sanctum']], function(){
     Route::get('enseignant', [EnseignantController::class, 'user']);
     Route::post('update_enseignant', [EnseignantController::class, 'update']);
-    Route::post('logout_enseignant', [EnseignantController::class, 'logout']);
  
  });  
 
@@ -53,6 +60,5 @@ Route::post('login_admin',[AdminController::class, 'login']);
   Route::group(['middleware'=>['auth:sanctum']], function(){
     Route::get('admin', [AdminController::class, 'user']);
     Route::post('update_admin', [AdminController::class, 'update']);
-    Route::post('logout_admin', [AdminController::class, 'logout']);
  
  }); 

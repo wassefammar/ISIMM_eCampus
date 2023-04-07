@@ -54,34 +54,6 @@ class StudentController extends Controller
     }
 
 
-    
-    public function login(Request $request){
-        $attrs= $request->validate([
-            'email'=>'required|email',
-            'password' => 'required|min:6'
-        ]);
-        if(!Auth::guard('students')->attempt($attrs)){
-            return response([
-             'message'=>'Vérifier vos informations'
-            ], 403);
-        }
-       //returns user & token in response
-        return response([
-            'user'=>Auth::guard('students')->user(),
-            'token'=>Auth::guard('students')->user()->createToken('secret')->plainTextToken
-        ],200);
-    }
-
-
-
-    public function logout(Request $request){
-        auth('sanctum')->user()->tokens()->delete();
-        return response()->json([
-            'message'=> 'Déconnecté'
-        ],200);
-    }
-
-
 
     //Cliquer sur l'icon de profile 
     public function user(){
@@ -122,5 +94,20 @@ class StudentController extends Controller
         }
             
 
+    }
+
+    public function fiit(){
+        $students=Student::all();
+        if(count($students)>0){
+            return response()->json([
+                'message'=> 'Voila la liste des etudiant',
+                'user'=>$students
+            ],200);  
+        }
+        else{
+            return response()->json([
+                'message'=> 'No data found',
+            ],404);
+        }
     }
 }

@@ -57,7 +57,7 @@ return [
             'driver'=>'session',
             'provider'=>'students'
         ],
-        'admin'=>[
+        'admins'=>[
             'driver'=>'session',
             'provider'=>'admins'     
         ],
