@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Enseignant;
+use App\Models\Matiere;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule; 
@@ -124,4 +125,13 @@ class EnseignantController extends Controller
             ],200);
         }
     }
+
+    /* public function assignSubject(Request $request, Enseignant $enseignant)
+    {   
+        $attrs=$request->validate([
+         
+        ]);
+        $matiere = Matiere::findOrFail($attrs['matiere']);
+        $enseignant->assignMatiere($matiere);
+    } */
 }

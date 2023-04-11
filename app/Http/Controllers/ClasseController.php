@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Classe;
+use App\Models\Enseignant;
+use App\Models\Matiere;
 use Illuminate\Http\Request;
 
 class ClasseController extends Controller
@@ -17,12 +19,13 @@ class ClasseController extends Controller
         //
         $classes=Classe::all();
         if($classes){
-            return response()->json([
+            return response([
+                'message'=>'Voilà les classes',
                 'classes'=>$classes
             ],200);
         }
         else{
-            return response()->json([
+            return response([
                 'message'=>'pas de classes pour le moment'
             ],200);
         }
@@ -43,15 +46,61 @@ class ClasseController extends Controller
         $attrs= $request->validate([
             'nom'=>'required|string'
         ]);
-        $classe=Classe::create([
-            'nom'=>$attrs['nom']
-        ]);
-        return response([
-            'message'=>'Classe crée avec succès',
-            'post'=> $classe
-        ],200);
+        if(Classe::where('nom','=',$attrs['nom'])->exists()){
+            return response([
+                'message'=>'Classe dèja existante',
+            ],409);
+        }
+        else{
+            $classe=Classe::create([
+                'nom'=>$attrs['nom']
+            ]);
+            return response([
+                'message'=>'Classe crée avec succès',
+                'classe'=> $classe
+            ],200);
+        }
+
     }
 
+    public function AssignClassToProf(Request $request){
+      $attrs=$request->validate([
+        'matiere_id'=>'required|integer',
+        'classe_id'=>'required|integer',
+        'enseignant_id'=>'required|integer'
+      ]);
+      $matiere=Matiere::find($attrs['matiere_id']);
+      $classe=Classe::find($attrs['classe_id']);
+      $enseignant=Enseignant::find($attrs['enseignant_id']);
+      if ($classe) {
+        if ($matiere) {
+             if ($enseignant) {
+                $enseignant->matieres()->attach($matiere->id);
+                $classe->matieres()->attach($matiere->id);
+                $classe->enseignants()->attach($enseignant->id);
+                return response([
+                    'message'=>'Associé avec succés.',
+                ],200);
+
+             } else {
+                return response([
+                    'message'=>'Enseignant non existant',
+                ],404);           
+              }
+             
+        } else {
+            return response([
+                'message'=>'Matiere non existant',
+            ],404);  
+        }
+        
+      } else {
+        return response([
+            'message'=>'Classe non existant',
+        ],404);  
+      }
+      
+    }
 
 
     /**

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Storage;
 class ClassDocumentController extends Controller
 {
 
+
     public function store(Request $request)
     {
         //

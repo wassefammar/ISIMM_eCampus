@@ -13,16 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('students', function (Blueprint $table) {
+        Schema::create('matiere_classes', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('matiere_id')->constrained('matieres')->cascadeOnDelete();
             $table->foreignId('classe_id')->constrained('classes')->cascadeOnDelete();
-            $table->string('nom');
-            $table->string('prenom');
-            $table->string('email')->unique();
-            $table->string('password');
-            $table->string('date_de_naissance');
-            $table->string('telephone');
-            $table->string('image');
             $table->timestamps();
         });
     }
@@ -34,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('students');
+        Schema::dropIfExists('matiere_classes');
     }
 };

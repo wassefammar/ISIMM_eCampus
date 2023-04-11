@@ -5,18 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ClassDocument extends Model
+class Exercices extends Model
 {
     use HasFactory;
-    protected $table="class_documents";
+    protected $table="exercices";
 
     protected $fillable = [
+        'matiere_id',
         'titre',
         'description',
         'file'
     ];
 
     public function matiere(){
-        return $this->belongsTo(Matiere::class, 'matiere_id');
+        return $this->belongsTo(Matiere::class,'matiere_id');
     }
 }

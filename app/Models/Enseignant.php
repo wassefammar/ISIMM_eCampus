@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Classe;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -25,7 +26,23 @@ class Enseignant extends Authenticatable
         'image'
     ];
 
-    public function classes():HasMany{
-        return $this->hasMany(Classe::class, 'id');
+    public function departement(){
+        return $this->belongsTo(Departement::class, 'departement_id');
     }
+
+    public function classes(){
+        return $this->belongsToMany(Classe::class, 'enseignant_classes');
+    }
+
+    public function matieres()
+    {
+        return $this->belongsToMany(Matiere::class, 'enseignant_matieres');
+    }
+
+/*     public function assignMatiere(Matiere $matiere)
+    {
+        $this->matieres()->attach($matiere);
+    } */
+
+
 }

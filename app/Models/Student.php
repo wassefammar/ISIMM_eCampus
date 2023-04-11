@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Classe;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
@@ -23,8 +24,13 @@ class Student extends Authenticatable
         'telephone',
         'image'
     ];
-    public function classe(): HasOne{
-       return $this->hasOne(Classe::class,'id');
+    public function classe(){
+        return $this->belongsTo(Classe::class, 'classe_id');
+    }
+
+    public function matieres()
+    {
+        return $this->belongsToMany(Matiere::class, 'matieres_etudiants');
     }
     
 }
