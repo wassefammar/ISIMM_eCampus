@@ -17,19 +17,22 @@ class LoginController extends Controller
         if(Auth::guard('students')->attempt($attrs)){
             return response([
                 'user'=>Auth::guard('students')->user(),
-                'token'=>Auth::guard('students')->user()->createToken('secret')->plainTextToken
+                'token'=>Auth::guard('students')->user()->createToken('secret',['etudiant'])->plainTextToken,
+                'flag'=>'student'
             ],200);
         }
         elseif(Auth::guard('enseignant')->attempt($attrs)){
             return response([
                 'user'=>Auth::guard('enseignant')->user(),
-                'token'=>Auth::guard('enseignant')->user()->createToken('secret')->plainTextToken
+                'token'=>Auth::guard('enseignant')->user()->createToken('secret',['enseignant'])->plainTextToken,
+                'flag'=>'enseignant'
             ],200);
         }
         elseif(Auth::guard('admins')->attempt($attrs)){
             return response([
                 'user'=>Auth::guard('admins')->user(),
-                'token'=>Auth::guard('admins')->user()->createToken('secret')->plainTextToken
+                'token'=>Auth::guard('admins')->user()->createToken('secret',['admin'])->plainTextToken,
+                'flag'=>'admin'
             ],200);
         }
         else{

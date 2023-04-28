@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\FichePresence;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Matiere extends Model
 {
@@ -40,6 +41,14 @@ class Matiere extends Model
 
     public function examens(){
         return $this->hasMany(Examen::class, 'matiere_id');
+    }
+
+    public function classDocuments(){
+        return $this->hasMany(ClassDocument::class, 'matiere_id');
+    }
+
+    public function fichePresence(){
+        return $this->hasMany(FichePresence::class, 'fichePresence_id');
     }
 
 }

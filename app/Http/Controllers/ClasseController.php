@@ -148,13 +148,13 @@ class ClasseController extends Controller
         $classe=Classe::find($id);
         if($classe){
             $classe->delete();
-            return response()->json([
+            return response([
                 'message'=>'Classe supprimée avec succès'
 
             ],200);
         }
         else{
-            return response()->json([
+            return response([
                 'message'=>'Classe inexistante'
 
             ],200); 

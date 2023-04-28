@@ -13,14 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('class_documents', function (Blueprint $table) {
+        Schema::create('list_presences', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('matiere_id')->constrained('matieres')->cascadeOnDelete();
+            $table->foreignId('fiche_presence')->constrained('fiche_presences')->cascadeOnDelete();
             $table->foreignId('student_id')->constrained('students')->cascadeOnDelete();
-            $table->string('flag');
-            $table->string('titre');
-            $table->string('description');
-            $table->string('file');
+            $table->foreignId('SessionMatiere_id')->constrained('session_matieres')->cascadeOnDelete();
+            $table->date('date');
+            $table->string('status');
             $table->timestamps();
         });
     }
@@ -32,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('class_documents');
+        Schema::dropIfExists('list_presences');
     }
 };

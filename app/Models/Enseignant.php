@@ -39,6 +39,10 @@ class Enseignant extends Authenticatable
         return $this->belongsToMany(Matiere::class, 'enseignant_matieres');
     }
 
+    public function fichePresence(){
+        return $this->hasMany(FichePresence::class, 'fichePresence_id');
+    }
+
 /*     public function assignMatiere(Matiere $matiere)
     {
         $this->matieres()->attach($matiere);

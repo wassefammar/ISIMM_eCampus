@@ -156,7 +156,7 @@ class CoursController extends Controller
         ]);
         $fullName=$attrs['filename'].'.pdf';  
 
-        if(Cours::where('file','!=',$fullName)->exists()){
+        if(Cours::where('file','==',$fullName)->exists()){
                 return response([
                     'message'=>'Document non existant',
                 ],404);
@@ -201,21 +201,21 @@ class CoursController extends Controller
             'description'=>'nullable|string',   
         ]);
 
-        $examen=Cours::find($id);
-        if ($examen) {
-            $examen->update([
+        $cours=Cours::find($id);
+        if ($cours) {
+            $cours->update([
                 'titre'=>$attrs['titre'],
                 'description'=>$attrs['description']
             ]);
 
             return response([
-                'message'=>'examen mis à jour avec succès.',
-                'examen'=>$examen
+                'message'=>'cours mis à jour avec succès.',
+                'cours'=>$cours
             ]);
 
         } else {
             return response([
-                'message'=>'examen non existant.',
+                'message'=>'cours non existant.',
             ]);
         }
     }

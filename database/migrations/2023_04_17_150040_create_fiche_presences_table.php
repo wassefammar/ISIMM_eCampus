@@ -13,14 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('class_documents', function (Blueprint $table) {
+        Schema::create('fiche_presences', function (Blueprint $table) {
             $table->id();
             $table->foreignId('matiere_id')->constrained('matieres')->cascadeOnDelete();
-            $table->foreignId('student_id')->constrained('students')->cascadeOnDelete();
-            $table->string('flag');
-            $table->string('titre');
-            $table->string('description');
-            $table->string('file');
+            $table->foreignId('classe_id')->constrained('classes')->cascadeOnDelete();
+            $table->foreignId('enseignant_id')->constrained('enseignants')->cascadeOnDelete();
             $table->timestamps();
         });
     }
@@ -32,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('class_documents');
+        Schema::dropIfExists('fiche_presences');
     }
 };

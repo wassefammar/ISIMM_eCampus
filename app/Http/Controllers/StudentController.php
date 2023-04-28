@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Classe;
 use App\Models\Student;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -53,7 +54,33 @@ class StudentController extends Controller
        
     }
 
-
+    public function AssignStudentToClass(Request $request){
+        $attrs=$request->validate([
+          'student_id'=>'required|integer',
+          'classe_id'=>'required|integer'
+        ]);
+        $etudiant=Student::find($attrs['student_id']);
+        $classe=Classe::find($attrs['classe_id']);
+        if ($classe) {
+          if ($etudiant) {
+                  $classe->etudiants()->attach($etudiant->id);
+                  return response([
+                      'message'=>'Etudiant associée avec succés.',
+                  ],200);
+  
+            } else {
+                    return response([
+                        'message'=>'Etudiant non existant',
+                    ],404);           
+                  }
+               
+        } else {
+          return response([
+              'message'=>'Classe non existante',
+          ],404);  
+        }
+        
+      }
 
     //Cliquer sur l'icon de profile 
     public function user(){

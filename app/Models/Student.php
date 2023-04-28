@@ -32,5 +32,9 @@ class Student extends Authenticatable
     {
         return $this->belongsToMany(Matiere::class, 'matieres_etudiants');
     }
+
+    public function classDocuments(){
+        return $this->hasMany(ClassDocument::class, 'student_id');
+    }
     
 }

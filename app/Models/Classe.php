@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Student;
 use App\Models\Enseignant;
+use App\Models\FichePresence;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -17,7 +18,7 @@ class Classe extends Model
         'nom'
     ];
     public function etudiants(){
-        return $this->belongsToMany(Student::class, 'id_etudiant');
+        return $this->hasMany(Student::class, 'classe_id');
     }
 
     public function enseignants()
@@ -35,6 +36,10 @@ class Classe extends Model
 
     public function emploiTemps(){
         return $this->hasOne(EmploiTemps::class,'emploi_id');
+    }
+    
+    public function fichePresence(){
+        return $this->hasMany(FichePresence::class, 'fichePresence_id');
     }
 
     public function chatRoom(){

@@ -1,11 +1,14 @@
 <?php
 
+use App\Http\Controllers\EmploiTempsController;
 use App\Http\Controllers\ExamenController;
 use App\Http\Controllers\ExercicesController;
+use App\Http\Controllers\ListPresenceController;
 use App\Http\Controllers\RemarqueController;
+use App\Http\Controllers\SessionMatiereController;
 use App\Models\Exercices;
+use App\Models\SessionMatiere;
 use Illuminate\Http\Request;
-use App\Models\ClassDocument;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CoursController;
@@ -45,8 +48,6 @@ Route::get('matieres',[MatiereController::class, 'index'])->middleware('auth:san
 Route::post('ajouter_matiere',[MatiereController::class, 'store'])->middleware('auth:sanctum');
 Route::post('ajouter_classe',[ClasseController::class, 'store'])->middleware('auth:sanctum');
 
-Route::post('associer_classe_to_prof',[ClasseController::class, 'AssignClassToProf'])->middleware('auth:sanctum');
-
 
 //les routes des cours
 
@@ -66,6 +67,23 @@ Route::post('update_exercice/{id}',[ExercicesController::class, 'update'])->midd
 Route::post('supprimer_exercice/{id}',[ExercicesController::class, 'destroy'])->middleware('auth:sanctum');
 
 
+
+//les routes des séances
+
+Route::get('seances',[SessionMatiereController::class, 'index'])->middleware('auth:sanctum');
+Route::post('ajouter_seance',[SessionMatiereController::class, 'store'])->middleware('auth:sanctum');
+Route::post('update_seance/{id}', [SessionMatiereController::class, 'update'])->middleware('auth:sanctum');
+
+
+
+
+//les routes de l'emploi
+
+
+
+
+
+
 //les routes des examens
 
 Route::get('examens',[ExamenController::class, 'index'])->middleware('auth:sanctum');
@@ -73,6 +91,20 @@ Route::get('download_examen', [ExamenController::class, 'download'])->middleware
 Route::apiResource('upload_examen',ExamenController::class)->only('store')->middleware('auth:sanctum');
 Route::post('update_examen/{id}',[ExamenController::class, 'update'])->middleware('auth:sanctum');
 Route::post('supprimer_examen/{id}',[ExamenController::class, 'destroy'])->middleware('auth:sanctum');
+
+
+//les routes pour les document de liste d'attente
+
+Route::get('document_en_attente', [ClassDocumentController::class,'indexEnseignant'])->middleware('auth:sanctum');
+Route::get('mes_documents', [ClassDocumentController::class,'indexEtudiant'])->middleware('auth:sanctum');
+Route::post('ajouter_document', [ClassDocumentController::class, 'store'])->middleware('auth:sanctum');
+Route::post('confirmer_ajout/{id}', [ClassDocumentController::class, 'confirmerAjout'])->middleware('auth:sanctum');
+Route::post('refuser_ajout/{id}', [ClassDocumentController::class, 'refuserAjout'])->middleware('auth:sanctum');
+Route::post('download_document',[ClassDocumentController::class, 'download'])->middleware('auth:sanctum');
+Route::post('update_document/{id}', [ClassDocumentController::class, 'update'])->middleware('auth:sanctum');
+Route::post('supprimer_document/{id}', [ClassDocumentController::class, 'destroy'])->middleware('auth:sanctum');
+
+
 
 
 //les routes des remarques
@@ -86,24 +118,64 @@ Route::post('supprimer_remarques/{id}',[RemarqueController::class, 'destroy'])->
 
 
 /****Groupe des apis liées aux etudiants */
- Route::group(['middleware'=>['auth:sanctum']], function(){
+ Route::group(['middleware'=>['auth:sanctum', 'abilities:etudiant']], function(){
    Route::get('etudiant', [StudentController::class, 'user']);
    Route::post('update_etudiant', [StudentController::class, 'update']);
+
+   //les routes pour les document de liste d'attente
+
+   
+   Route::get('mes_documents', [ClassDocumentController::class,'indexEtudiant'])->middleware('auth:sanctum');
+   Route::post('ajouter_document', [ClassDocumentController::class, 'store'])->middleware('auth:sanctum');
+   Route::post('download_document',[ClassDocumentController::class, 'download'])->middleware('auth:sanctum');
+   Route::post('update_document/{id}', [ClassDocumentController::class, 'update'])->middleware('auth:sanctum');
+   Route::post('supprimer_document/{id}', [ClassDocumentController::class, 'destroy'])->middleware('auth:sanctum');
+
 
 }); 
 
 
 /****Groupe des apis liées aux enseignants */
- Route::group(['middleware'=>['auth:sanctum']], function(){
+ Route::group(['middleware'=>['auth:sanctum','abilities:enseignant']], function(){
     Route::get('enseignant', [EnseignantController::class, 'user']);
     Route::post('update_enseignant', [EnseignantController::class, 'update']);
+
+    //les routes pour les document de liste d'attente
+    
+    Route::get('document_en_attente', [ClassDocumentController::class,'indexEnseignant']);
+    Route::post('confirmer_ajout/{id}', [ClassDocumentController::class, 'confirmerAjout']);
+    Route::post('refuser_ajout/{id}', [ClassDocumentController::class, 'refuserAjout']);
+    Route::post('download_document',[ClassDocumentController::class, 'download']);
+
+
+    //les routes des remarques
+
+    Route::get('remarques',[RemarqueController::class, 'index']); 
+    Route::post('ajouter_remarque', [RemarqueController::class, 'store']);
+    Route::post('update_remarque/{id}',[RemarqueController::class,'update']);
+    Route::post('supprimer_remarques/{id}',[RemarqueController::class, 'destroy']);
+
+
+    //les routes pour la présence
+    Route::get('liste_presence',[ListPresenceController::class, 'index']);
+    Route::post('confirmer_presence',[ListPresenceController::class, 'store']);
+    Route::post('update_presence', [ListPresenceController::class, 'update']);
+
+    //emploi
+    Route::get('emploi',[EmploiTempsController::class, 'indexForEnseignants']);
+
  
  });  
 
 
  /****Groupe des apis liées aux admins */
-  Route::group(['middleware'=>['auth:sanctum']], function(){
+  Route::group(['middleware'=>['auth:sanctum, ability:admin']], function(){
     Route::get('admin', [AdminController::class, 'user']);
     Route::post('update_admin', [AdminController::class, 'update']);
+    Route::post('associer_enseignant_classe', [ClasseController::class, 'AssignClassToProf']);
+    Route::post('associer_matiere_classe',[MatiereController::class,'AssignMatiereToClass']);
+    //emploi
+    Route::post('ajouter_emploi',[EmploiTempsController::class, 'store']);
+    Route::post('supprimer_emploi/{id}', [EmploiTempsController::class, 'destroy']);
  
  }); 

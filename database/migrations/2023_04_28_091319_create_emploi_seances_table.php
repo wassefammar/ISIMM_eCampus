@@ -13,14 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('class_documents', function (Blueprint $table) {
+        Schema::create('emploi_seances', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('matiere_id')->constrained('matieres')->cascadeOnDelete();
-            $table->foreignId('student_id')->constrained('students')->cascadeOnDelete();
-            $table->string('flag');
-            $table->string('titre');
-            $table->string('description');
-            $table->string('file');
+            $table->foreignId('emploi_temps_id')->constrained('emploi_temps')->cascadeOnDelete();
+            $table->foreignId('session_matiere_id')->constrained('session_matieres')->cascadeOnDelete();
             $table->timestamps();
         });
     }
@@ -32,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('class_documents');
+        Schema::dropIfExists('emploi_seances');
     }
 };

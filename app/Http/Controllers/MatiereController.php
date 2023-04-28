@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\EnseignantMatiere;
+use App\Models\Classe;
 use App\Models\Matiere;
-use App\Models\MatiereClasse;
 use Illuminate\Http\Request;
+use App\Models\MatiereClasse;
+use App\Models\EnseignantMatiere;
 
 class MatiereController extends Controller
 {
@@ -17,6 +18,7 @@ class MatiereController extends Controller
     public function index()
     {
         //
+        $id=auth('sanctum')->guard('admins')->user()->id;
         $matieres=Matiere::all();
         if(count($matieres)>0){
             return response([
@@ -76,6 +78,36 @@ class MatiereController extends Controller
         
     }
 
+
+
+
+    public function AssignMatiereToClass(Request $request){
+        $attrs=$request->validate([
+          'matiere_id'=>'required|integer',
+          'classe_id'=>'required|integer'
+        ]);
+        $matiere=Matiere::find($attrs['matiere_id']);
+        $classe=Classe::find($attrs['classe_id']);
+        if ($classe) {
+          if ($matiere) {
+                  $classe->matieres()->attach($matiere->id);
+                  return response([
+                      'message'=>'Matière associée avec succés.',
+                  ],200);
+  
+            } else {
+                    return response([
+                        'message'=>'Matiere non existant',
+                    ],404);           
+                  }
+               
+        } else {
+          return response([
+              'message'=>'Classe non existante',
+          ],404);  
+        }
+        
+      }
     /**
      * Display the specified resource.
      *
