@@ -1,23 +1,26 @@
 <?php
 
-use App\Http\Controllers\EmploiTempsController;
-use App\Http\Controllers\ExamenController;
-use App\Http\Controllers\ExercicesController;
-use App\Http\Controllers\ListPresenceController;
-use App\Http\Controllers\RemarqueController;
-use App\Http\Controllers\SessionMatiereController;
 use App\Models\Exercices;
-use App\Models\SessionMatiere;
 use Illuminate\Http\Request;
+use App\Models\SessionMatiere;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\LikeController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CoursController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ClasseController;
+use App\Http\Controllers\ExamenController;
+use App\Http\Controllers\AnnonceController;
+use App\Http\Controllers\DeslikeController;
 use App\Http\Controllers\MatiereController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\RemarqueController;
+use App\Http\Controllers\ExercicesController;
 use App\Http\Controllers\EnseignantController;
+use App\Http\Controllers\EmploiTempsController;
+use App\Http\Controllers\ListPresenceController;
 use App\Http\Controllers\ClassDocumentController;
+use App\Http\Controllers\SessionMatiereController;
 
 /*
 |--------------------------------------------------------------------------
@@ -77,7 +80,16 @@ Route::post('update_seance/{id}', [SessionMatiereController::class, 'update'])->
 
 
 
-//les routes de l'emploi
+//les routes des annonces
+
+
+Route::get('annonces',[AnnonceController::class, 'index'])->middleware('auth:sanctum');
+Route::post('ajouter_annonce',[AnnonceController::class, 'storeForEnseignants'])->middleware('auth:sanctum');
+Route::post('like/{id}',[LikeController::class, 'likeOrUnlike'])->middleware('auth:sanctum');
+Route::post('deslike/{id}',[DeslikeController::class, 'deslikeOrUndeslike'])->middleware('auth:sanctum');
+Route::post('update_annonce/{id}',[AnnonceController::class, 'update'])->middleware('auth:sanctum');
+Route::post('supprimer_annonce/{id}',[AnnonceController::class, 'destroy'])->middleware('auth:sanctum');
+
 
 
 
