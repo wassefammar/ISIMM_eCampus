@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\ChatRoomController;
+use App\Http\Controllers\MessageController;
 use App\Models\Exercices;
 use Illuminate\Http\Request;
 use App\Models\SessionMatiere;
@@ -90,7 +92,9 @@ Route::post('deslike/{id}',[DeslikeController::class, 'deslikeOrUndeslike'])->mi
 Route::post('update_annonce/{id}',[AnnonceController::class, 'update'])->middleware('auth:sanctum');
 Route::post('supprimer_annonce/{id}',[AnnonceController::class, 'destroy'])->middleware('auth:sanctum');
 
-
+//Messages
+Route::post('messages',[MessageController::class, 'store'])->middleware('auth:sanctum');
+Route::get('chat_rooms',[ChatRoomController::class, 'index'])->middleware('auth:sanctum');
 
 
 

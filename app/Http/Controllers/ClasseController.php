@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ChatRoom;
 use App\Models\Classe;
 use App\Models\Enseignant;
 use App\Models\Matiere;
@@ -55,10 +56,32 @@ class ClasseController extends Controller
             $classe=Classe::create([
                 'nom'=>$attrs['nom']
             ]);
-            return response([
-                'message'=>'Classe crée avec succès',
-                'classe'=> $classe
-            ],200);
+            if($classe){
+                $classeId=Classe::where('nom','=',$attrs['nom'])->first('id');
+                $chatRoom=ChatRoom::create([
+                   'classe_id'=>intval($classeId->id) ,
+                   'name'=>$attrs['nom']
+                ]);
+                if($chatRoom){
+                    return response([
+                        'message'=>'Classe et chat room crée avec succès',
+                        'classe'=> $classe
+                    ],200);
+                }
+                else{
+                    return response([
+                        'message'=>'Classe crée avec succès',
+                        'classe'=> $classe
+                    ],200);
+                }
+
+            }
+            else{
+                return response([
+                    'message'=>'Oops.. problème'                
+                ],500); 
+            }
+
         }
 
     }

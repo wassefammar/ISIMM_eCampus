@@ -29,12 +29,12 @@ class AnnonceController extends Controller
                     }
                 }
                 elseif($annonces[$i]->type_user==="etudiant"){
-                    $proprietaires[$i]=Student::where('id','=',$annoncesIds[$i]->proprietare_id)->get(['id','classe_id','nom','prenom','image']);
+                    $proprietaires[$i]=Student::where('id','=',$annoncesIds[$i]->proprietare_id)->first(['id','classe_id','nom','prenom','image']);
                     $submasques[$i]=Classe::where('id','=',$proprietaires[$i]->classe_id)->first('nom');
 
                 }
                 else{
-                    $proprietaires[$i]=Admin::where('id','=',$annoncesIds[$i]->proprietare_id)->get(['id','nom','prenom','image']);
+                    $proprietaires[$i]=Admin::where('id','=',$annoncesIds[$i]->proprietare_id)->first(['id','nom','prenom','image']);
                     $submasques[$i]='admin';
                 }
             } 

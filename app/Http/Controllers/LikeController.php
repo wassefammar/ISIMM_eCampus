@@ -19,6 +19,10 @@ class LikeController extends Controller
         $like= $annonce->likes()->where('proprietaire_id', auth('sanctum')->user()->id)->first();
 
         if(!$like){
+            $deslike= $annonce->deslikes()->where('proprietaire_id', auth('sanctum')->user()->id)->first();
+            if($deslike){
+                $deslike->delete();
+            }
             Like::create([
                 'annonce_id'=>$id,
                 'proprietaire_id'=>auth('sanctum')->user()->id

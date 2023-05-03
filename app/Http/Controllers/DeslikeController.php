@@ -19,6 +19,10 @@ class DeslikeController extends Controller
         $deslike= $annonce->deslikes()->where('proprietaire_id', auth('sanctum')->user()->id)->first();
 
         if(!$deslike){
+            $like= $annonce->likes()->where('proprietaire_id', auth('sanctum')->user()->id)->first();
+            if($like){
+                $like->delete();
+            }
             Deslike::create([
                 'annonce_id'=>$id,
                 'proprietaire_id'=>auth('sanctum')->user()->id
