@@ -18,7 +18,7 @@ class MatiereController extends Controller
     public function index()
     {
         //
-        $id=auth('sanctum')->guard('admins')->user()->id;
+        $id=auth('sanctum')->user()->id;
         $matieres=Matiere::all();
         if(count($matieres)>0){
             return response([
@@ -108,16 +108,7 @@ class MatiereController extends Controller
         }
         
       }
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Matiere  $matiere
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Matiere $matiere)
-    {
-        //
-    }
+
 
 
 

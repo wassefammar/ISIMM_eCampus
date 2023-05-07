@@ -23,7 +23,8 @@ class Enseignant extends Authenticatable
         'password',
         'date_de_naissance',
         'telephone',
-        'image'
+        'image',
+        'departement_id'
     ];
 
     public function departement(){

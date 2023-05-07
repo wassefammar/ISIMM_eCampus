@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Classe;
+use App\Models\EmploiSeance;
+use App\Models\EmploiTemps;
+use App\Models\EtudiantClasse;
 use App\Models\FichePresence;
 use App\Models\ListPresence;
 use App\Models\Matiere;
@@ -42,7 +45,13 @@ class ListPresenceController extends Controller
                 ->get();
 
 
-        $etudiants=Student::where('classe_id','=',$classeId)->get(['nom','prenom', 'image']);
+       // $etudiants=Student::where('classe_id','=',$classeId)->get(['nom','prenom', 'image']);
+        $etudiantIds=EtudiantClasse::where('classe_id','=',$classeId)->get('student_id');
+        $i=0;
+        foreach($etudiantIds as $etudiantId){
+            $etudiants[$i]=Student::where('id','=',$etudiantId->student_id)->get(['id','nom','prenom', 'image']);
+            $i++;
+        }
         if (count($etudiants)>0) {
             if(count($emc)>0){
                 return response([
@@ -74,11 +83,21 @@ class ListPresenceController extends Controller
             'status'=>'required|array'
            ]);
           $status=$attrs['status'];
-           $sessionMatiere=SessionMatiere::find($attrs['sessionMatiere_id'])->get();
-           if(count($sessionMatiere)>0){
-                    $enseignantId=$sessionMatiere->flatten()->pluck('enseignant_id')->all();
-                    $classeId=$sessionMatiere->flatten()->pluck('classe_id')->all();
-                    $matiereId=$sessionMatiere->flatten()->pluck('matiere_id')->all();
+           $sessionMatiere=SessionMatiere::find($attrs['sessionMatiere_id'])->first();
+           if($sessionMatiere){
+                    $enseignantId=$sessionMatiere->enseignant_id;
+                    $emploiId=$sessionMatiere->classe_id;
+                    $emploiId=EmploiSeance::where('session_matiere_id','=',$attrs['sessionMatiere_id'])->first('emploi_temps_id');
+                    if($emploiId){
+                        $classe=EmploiTemps::where('id','=',$emploiId->emploi_temps_id)->first('classe_id');
+                        $classeId=$classe->classe_id;
+                    }else{
+                        return response([
+                            'message'=>'séance non existante'
+                        ],404);
+                    }
+
+                    $matiereId=$sessionMatiere->matiere_id;
 
                     $emc = EnseignantMatiere::where('enseignant_id', '=', $enseignantId)
                                             ->where('matiere_id', '=', $matiereId)
@@ -101,33 +120,55 @@ class ListPresenceController extends Controller
                     $fichePresence=FichePresence::where('matiere_id','=',$matiereId)
                                                     ->where('classe_id','=',$classeId)
                                                     ->where('enseignant_id','=',$enseignantId)
-                                                    ->get();
-                    $etudiants=Student::where('classe_id','=',$classeId)->get('id');
+                                                    ->first();
+                    $etudiantIds=EtudiantClasse::where('classe_id','=',$classeId)->get('student_id');
+                    if(count($etudiantIds)>0){
+                        $i=0;
+                        foreach($etudiantIds as $etudiantId){
+                            $etudiants[$i]=Student::where('id','=',$etudiantId->student_id)->first('id');
+                            $i++;
+                        }
+                        
+                    }
+                    else{
+                        return response([
+                            'message'=>'aucun étudiant attribué à cette classe'
+                        ],404);
+                    }
+                   
                     if($fichePresence){ 
                         if(count($emc)>0){
                             if($classe){
                                 if($matiere){
-                                    for($j=0;$j<count($etudiants);$j++){
-                                        $listPresence=ListPresence::create([
-                                            'fiche_presence'=>$fichePresence->flatten()->pluck('id')->first(),
-                                            'sessionMatiere_id'=>$attrs['sessionMatiere_id'],
-                                            'date'=>$attrs['date'],
-                                            'student_id'=>$etudiants[$j]->id,
-                                            'status'=>$status[$j]
-                                        ]); 
-                                    }
-
-                                    if($listPresence){
-                                    $listPresence->fichePresence()->associate($fichePresence->flatten()->pluck('id')->first());
-                                    return response([
-                                         'message : liste de présence ajouté avec succès.'
-                                        ],200);
+                                    if(count($etudiants)==count($status)) {
+                                        for($j=0;$j<count($etudiants);$j++){
+                                            $listPresence=ListPresence::create([
+                                                'fiche_presence'=>$fichePresence->id,
+                                                'sessionMatiere_id'=>$attrs['sessionMatiere_id'],
+                                                'date'=>$attrs['date'],
+                                                'student_id'=>$etudiants[$j]->id,
+                                                'status'=>$status[$j]
+                                            ]); 
+                                        }
+    
+                                        if($listPresence){
+                                        $listPresence->fichePresence()->associate($fichePresence->id);
+                                        return response([
+                                             'message'=> 'liste de présence ajouté avec succès.'
+                                            ],200);
+                                        }
+                                        else{
+                                            return response([
+                                                'message'=>'Oops.. il ya un problème'
+                                            ],500);
+                                        }
                                     }
                                     else{
                                         return response([
-                                            'message'=>'Oops.. il ya un problème'
-                                        ],500);
+                                            'message'=>'Vérifier les inputs'
+                                        ],422);
                                     }
+
                 
                                 }else{
                                     return response([
@@ -149,19 +190,19 @@ class ListPresenceController extends Controller
                         } 
                     }else{
                         FichePresence::create([
-                            'matiere_id'=>$attrs['matiere_id'],
-                            'classe_id'=>$attrs['classe_id'],
+                            'matiere_id'=>$matiereId,
+                            'classe_id'=>$classeId,
                             'enseignant_id'=>$enseignantId
                         ]);
                         $NewfichePresence=FichePresence::where('matiere_id','=',$matiereId)
                                                         ->where('classe_id','=',$classeId)
                                                         ->where('enseignant_id','=',$enseignantId)
-                                                        ->exists();
+                                                        ->first();
                         
                         if($NewfichePresence){
                             for($j=0;$j<count($etudiants);$j++){
                                 $listPresence=ListPresence::create([
-                                    'fiche_presence'=>$fichePresence->flatten()->pluck('id')->first(),
+                                    'fiche_presence'=>$NewfichePresence->id,
                                     'sessionMatiere_id'=>$attrs['sessionMatiere_id'],
                                     'date'=>$attrs['date'],
                                     'student_id'=>$etudiants[$j]->id,
@@ -188,6 +229,10 @@ class ListPresenceController extends Controller
 
 
                     }                                  
+        }else{
+            return response([
+                'message'=>'Séance introuvable'
+            ],404);
         }
     
              
@@ -206,17 +251,25 @@ class ListPresenceController extends Controller
         $listPresence=ListPresence::where('sessionMatiere_id','=',$attrs['sessionMatiere_id'])
                                    ->where('date','=',$attrs['date'])
                                    ->get();
-        if($listPresence){
-            $fichePresence=FichePresence::find($listPresence->first()->fiche_presence)->get();
-            if($fichePresence->flatten()->pluck('enseignant_id')->first()==auth('sanctum')->user()->id){
+        if(count($listPresence)>0){
+            $fichePresence=FichePresence::find($listPresence->first()->fiche_presence)->first();
+            if($fichePresence->enseignant_id==auth('sanctum')->user()->id){
                 for($j=0;$j<count($etudiantIds);$j++){
-                    $listPresenceE=$listPresence->where('student_id','=',$etudiantIds[$j])->first();
-                    $listPresenceE->update([
-                        'status'=>$status[$j],
-                      ]);
-                }
+                    $listPresenceE=ListPresence::where('sessionMatiere_id','=',$attrs['sessionMatiere_id'])
+                                               ->where('date','=',$attrs['date'])
+                                               ->where('student_id','=',$etudiantIds[$j])->first();
+                    if($listPresenceE){
+                        $listPresenceE->update([
+                            'status'=>$status[$j],
+                          ]);
+                    }else{
+                        return response([
+                            'message'=>'etudiant ayant id '.$etudiantIds[$j].' inexistatnt dans cette liste'
+                        ],404);  
+                    }
+                         
 
-      
+                }
                   return response([
                       'message'=>'liste de présence mise à jour avec succès.'
                      ],200);

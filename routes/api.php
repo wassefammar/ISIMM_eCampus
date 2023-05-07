@@ -1,10 +1,13 @@
 <?php
 
 use App\Http\Controllers\ChatRoomController;
+use App\Http\Controllers\EpreuveController;
 use App\Http\Controllers\MessageController;
-use App\Models\Exercices;
-use Illuminate\Http\Request;
-use App\Models\SessionMatiere;
+use App\Http\Controllers\PFEBookController;
+use App\Http\Controllers\RapportPFEController;
+use App\Http\Controllers\ResultatController;
+use App\Http\Controllers\SocieteController;
+use App\Models\RapportPFE;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\AdminController;
@@ -86,17 +89,30 @@ Route::post('update_seance/{id}', [SessionMatiereController::class, 'update'])->
 
 
 Route::get('annonces',[AnnonceController::class, 'index'])->middleware('auth:sanctum');
-Route::post('ajouter_annonce',[AnnonceController::class, 'storeForEnseignants'])->middleware('auth:sanctum');
 Route::post('like/{id}',[LikeController::class, 'likeOrUnlike'])->middleware('auth:sanctum');
 Route::post('deslike/{id}',[DeslikeController::class, 'deslikeOrUndeslike'])->middleware('auth:sanctum');
 Route::post('update_annonce/{id}',[AnnonceController::class, 'update'])->middleware('auth:sanctum');
-Route::post('supprimer_annonce/{id}',[AnnonceController::class, 'destroy'])->middleware('auth:sanctum');
+Route::delete('supprimer_annonce/{id}',[AnnonceController::class, 'destroy'])->middleware('auth:sanctum');
 
 //Messages
 Route::post('messages',[MessageController::class, 'store'])->middleware('auth:sanctum');
 Route::get('chat_rooms',[ChatRoomController::class, 'index'])->middleware('auth:sanctum');
+Route::get('messages/{id}', [MessageController::class, 'index'])->middleware('auth:sanctum');
 
 
+//les epreuves
+Route::get('epreuves',[EpreuveController::class, 'indexForAdmin'])->middleware('auth:sanctum');
+Route::get('list_epreuves',[EpreuveController::class, 'indexForStudents'])->middleware('auth:sanctum');
+Route::post('ajouter_epreuve',[EpreuveController::class, 'store'])->middleware('auth:sanctum');
+Route::patch('update_epreuve/{id}',[EpreuveController::class, 'update'])->middleware('auth:sanctum');
+Route::delete('supprimer_epreuve/{id}',[EpreuveController::class, 'destroy'])->middleware('auth:sanctum');
+
+
+//les résultats
+Route::get('mes_resultats',[ResultatController::class, 'index'])->middleware('auth:sanctum');
+Route::post('ajouter_resultat',[ResultatController::class, 'store'])->middleware('auth:sanctum');
+Route::patch('update_resultat/{id}',[ResultatController::class, 'update'])->middleware('auth:sanctum');
+Route::delete('supprimer_resultat/{id}',[ResultatController::class, 'destroy'])->middleware('auth:sanctum');
 
 
 
@@ -106,7 +122,7 @@ Route::get('examens',[ExamenController::class, 'index'])->middleware('auth:sanct
 Route::get('download_examen', [ExamenController::class, 'download'])->middleware('auth:sanctum');
 Route::apiResource('upload_examen',ExamenController::class)->only('store')->middleware('auth:sanctum');
 Route::post('update_examen/{id}',[ExamenController::class, 'update'])->middleware('auth:sanctum');
-Route::post('supprimer_examen/{id}',[ExamenController::class, 'destroy'])->middleware('auth:sanctum');
+Route::delete('supprimer_examen/{id}',[ExamenController::class, 'destroy'])->middleware('auth:sanctum');
 
 
 //les routes pour les document de liste d'attente
@@ -118,9 +134,40 @@ Route::post('confirmer_ajout/{id}', [ClassDocumentController::class, 'confirmerA
 Route::post('refuser_ajout/{id}', [ClassDocumentController::class, 'refuserAjout'])->middleware('auth:sanctum');
 Route::post('download_document',[ClassDocumentController::class, 'download'])->middleware('auth:sanctum');
 Route::post('update_document/{id}', [ClassDocumentController::class, 'update'])->middleware('auth:sanctum');
-Route::post('supprimer_document/{id}', [ClassDocumentController::class, 'destroy'])->middleware('auth:sanctum');
+Route::delete('supprimer_document/{id}', [ClassDocumentController::class, 'destroy'])->middleware('auth:sanctum');
 
 
+//les routes du rapport PFE
+Route::get('rapports',[RapportPFEController::class, 'index'])->middleware('auth:sanctum');
+Route::post('telecharger_rapport',[RapportPFEController::class, 'download'])->middleware('auth:sanctum');
+Route::post('ajouter_rapport',[RapportPFEController::class, 'store'])->middleware('auth:sanctum');
+Route::patch('update_rapport/{id}',[RapportPFEController::class, 'update'])->middleware('auth:sanctum');
+Route::delete('supprimer_rapport/{id}', [RapportPFEController::class, 'destroy'])->middleware('auth:sanctum');
+
+
+//liste des etudiants
+Route::get('etudiants',[StudentController::class, 'listEtudiants'])->middleware('auth:sanctum');
+Route::post('modifier_etudiant/{id}',[StudentController::class, 'modifierEtudiant'])->middleware('auth:sanctum');
+Route::delete('supprimer_etudiant/{id}',[StudentController::class, 'supprimerEtudiant'])->middleware('auth:sanctum');
+
+
+//list des enseignants
+Route::get('enseignants',[EnseignantController::class, 'listEnseignants'])->middleware('auth:sanctum');
+Route::post('modifier_enseignant/{id}',[EnseignantController::class, 'modifierEnseignant'])->middleware('auth:sanctum');
+Route::delete('supprimer_enseignant/{id}',[EnseignantController::class, 'supprimerEnseignant'])->middleware('auth:sanctum');
+
+//les routes des societes
+Route::get('societes',[SocieteController::class, 'index'])->middleware('auth:sanctum');
+Route::post('ajouter_societe', [SocieteController::class, 'store'])->middleware('auth:sanctum');
+Route::patch('update_societe/{id}',[SocieteController::class, 'update'])->middleware('auth:sanctum');
+Route::delete('supprimer_societe/{id}',[SocieteController::class, 'destroy'])->middleware('auth:sanctum');
+
+//les routes des PFEBook
+Route::get('pfeBooks',[PFEBookController::class, 'index'])->middleware('auth:sanctum');
+Route::post('telecharger_pfeBook',[PFEBookController::class, 'download'])->middleware('auth:sanctum');
+Route::post('ajouter_pfeBook',[PFEBookController::class, 'store'])->middleware('auth:sanctum');
+Route::patch('update_pfeBook/{id}',[PFEBookController::class, 'update'])->middleware('auth:sanctum');
+Route::delete('supprimer_pfeBook/{id}', [PFEBookController::class, 'destroy'])->middleware('auth:sanctum');
 
 
 //les routes des remarques
@@ -128,7 +175,7 @@ Route::post('supprimer_document/{id}', [ClassDocumentController::class, 'destroy
 Route::get('remarques',[RemarqueController::class, 'index'])->middleware('auth:sanctum');
 Route::post('ajouter_remarque', [RemarqueController::class, 'store'])->middleware('auth:sanctum');
 Route::post('update_remarque/{id}',[RemarqueController::class,'update'])->middleware('auth:sanctum');
-Route::post('supprimer_remarques/{id}',[RemarqueController::class, 'destroy'])->middleware('auth:sanctum');
+Route::delete('supprimer_remarques/{id}',[RemarqueController::class, 'destroy'])->middleware('auth:sanctum');
 
 
 
@@ -145,7 +192,12 @@ Route::post('supprimer_remarques/{id}',[RemarqueController::class, 'destroy'])->
    Route::post('ajouter_document', [ClassDocumentController::class, 'store'])->middleware('auth:sanctum');
    Route::post('download_document',[ClassDocumentController::class, 'download'])->middleware('auth:sanctum');
    Route::post('update_document/{id}', [ClassDocumentController::class, 'update'])->middleware('auth:sanctum');
-   Route::post('supprimer_document/{id}', [ClassDocumentController::class, 'destroy'])->middleware('auth:sanctum');
+   Route::delete('supprimer_document/{id}', [ClassDocumentController::class, 'destroy'])->middleware('auth:sanctum');
+
+   //annonces
+   Route::delete('supprimer_annonce/{id}',[AnnonceController::class, 'destroy'])->middleware('auth:sanctum');
+   Route::post('enseignant/ajouter_annonce',[AnnonceController::class, 'storeForEnseignants'])->middleware('auth:sanctum');
+
 
 
 }); 
@@ -169,7 +221,7 @@ Route::post('supprimer_remarques/{id}',[RemarqueController::class, 'destroy'])->
     Route::get('remarques',[RemarqueController::class, 'index']); 
     Route::post('ajouter_remarque', [RemarqueController::class, 'store']);
     Route::post('update_remarque/{id}',[RemarqueController::class,'update']);
-    Route::post('supprimer_remarques/{id}',[RemarqueController::class, 'destroy']);
+    Route::delete('supprimer_remarques/{id}',[RemarqueController::class, 'destroy']);
 
 
     //les routes pour la présence
@@ -180,18 +232,29 @@ Route::post('supprimer_remarques/{id}',[RemarqueController::class, 'destroy'])->
     //emploi
     Route::get('emploi',[EmploiTempsController::class, 'indexForEnseignants']);
 
+   //annonce
+    Route::post('enseignant/ajouter_annonce',[AnnonceController::class, 'storeForEnseignants'])->middleware('auth:sanctum');
+
+
  
  });  
 
 
  /****Groupe des apis liées aux admins */
-  Route::group(['middleware'=>['auth:sanctum, ability:admin']], function(){
+  Route::group(['middleware'=>['auth:sanctum', 'abilities:admin']], function(){
     Route::get('admin', [AdminController::class, 'user']);
     Route::post('update_admin', [AdminController::class, 'update']);
     Route::post('associer_enseignant_classe', [ClasseController::class, 'AssignClassToProf']);
     Route::post('associer_matiere_classe',[MatiereController::class,'AssignMatiereToClass']);
+    Route::post('desassocier_enseignant_classe',[ClasseController::class,'desassocierEnseignantClasse']);
+    Route::post('associer_etudiant_classe',[ClasseController::class,'AssignStudentToClass']);
+    Route::post('desassocier_etudiant_classe',[ClasseController::class,'desassocierEtudiantClasse']);
     //emploi
     Route::post('ajouter_emploi',[EmploiTempsController::class, 'store']);
-    Route::post('supprimer_emploi/{id}', [EmploiTempsController::class, 'destroy']);
+    Route::delete('supprimer_emploi/{id}', [EmploiTempsController::class, 'destroy']);
+
+    //admin
+    Route::post('admin/ajouter_annonce',[AnnonceController::class, 'storeForAdmins'])->middleware('auth:sanctum');
+
  
  }); 

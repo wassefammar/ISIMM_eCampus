@@ -136,10 +136,7 @@ class ExercicesController extends Controller
      * @param  \App\Models\Exercices  $exercices
      * @return \Illuminate\Http\Response
      */
-    public function show(Exercices $exercices)
-    {
-        //
-    }
+
 
     public function download(Request $request){
         //PDF file is stored under project/public/download/info.pdf

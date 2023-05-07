@@ -16,12 +16,21 @@ const connection = mysql.createConnection({
   database: 'isimm'
 });
 
+// channel
+const channelName = "anonymous_group";
+let messages = []; // les messages seront stockés ici
 
 access_token="10|JQG2mPMzvDywkqYHoNFeUEoeYNfdqYqKsl4xGVYs";
 
 // Écoute de l'événement 'connection' de Socket.io
 io.on('connection', (socket) => {
+  socket.join(channelName);
+  console.log('Backend Connected');
+  console.log(socket.id);
   console.log(`Un utilisateur s'est connecté avec l'ID ${socket.id}`);
+
+    // envoi des messages existants lorsqu'un nouvel utilisateur se connecte
+    socket.emit("loadMessages", messages);
 
   // Écoute de l'événement 'message' de Socket.io
   socket.on('message', (message) => {
@@ -35,10 +44,12 @@ io.on('connection', (socket) => {
       },
       data:{
         "text":message.content,
-        "user_id":message.sender,
         "chat_id":1
       }
     });  
+
+    messages.push(msg);
+    io.to(channelName).emit('SendMsgServer', {...msg, type: "otherMsg"}); // utilisez le même type que celui du message reçu
   });
 });
 

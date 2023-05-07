@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cours;
+use App\Models\Classe;
 use App\Models\Examen;
 use App\Models\Student;
 use App\Models\Exercices;
 use Illuminate\Http\Request;
 use App\Models\ClassDocument;
+use App\Models\EtudiantClasse;
 use App\Models\EnseignantMatiere;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -41,9 +43,14 @@ class ClassDocumentController extends Controller
                  ->get();
         
         if(count($emc)>0){
-            $students=Student::where('classe_id','=',$classeId)->get();
+            $students=EtudiantClasse::where('classe_id','=',$classeId)->get('student_id');
             if(count($students)>0){
-                $studentIds=$students->flatten()->pluck('id')->all();
+                $i=0;
+                foreach($students as $student){
+                    $studentIds[$i]=$student->student_id;
+                    $i++;
+                }
+                
                 $classDocuments=ClassDocument::where('matiere_id','=',$matiereId)->whereIn('student_id',$studentIds)->get();
                 if(count($classDocuments)>0){
                     return response([
@@ -104,9 +111,7 @@ class ClassDocumentController extends Controller
         ]);
         $studentId=auth('sanctum')->user()->id;
         $student=Student::where('id','=',$studentId)->get();
-        if(count($student)>0){
-            $classId=$student->flatten()->pluck('classe_id')->all();
-            
+        if(count($student)>0){            
             $fileName= $attrs['name'].".".$attrs['file']->getClientOriginalExtension();
             $fichier=ClassDocument ::create([
                 'matiere_id'=>$attrs['matiere_id'],
@@ -162,10 +167,11 @@ class ClassDocumentController extends Controller
 
     public function destroy($id){
         
-        $document=ClassDocument::find($id);
+        $document=ClassDocument::where('id','=',$id)->first();;
         $etudiantId=auth('sanctum')->user()->id;
         if($document){
           if($document->student_id==$etudiantId){
+            unlink(storage_path().'/app/public/'.$document->rapport);
             $document->delete();
             return response([
                 'message'=>'supprimé avec succès'
@@ -188,7 +194,7 @@ class ClassDocumentController extends Controller
         'description'=>'required|string'
        ]);
 
-       $document=ClassDocument::find($id);
+       $document=ClassDocument::where('id','=',$id)->first();;
        if($document){
             if($document->student_id==auth('sanctum')->user()->id){
                 $document->update([
@@ -216,15 +222,21 @@ class ClassDocumentController extends Controller
     }
 
     public function refuserAjout(Request $request, $id){
-        $document=ClassDocument::find($id);
+        $document=ClassDocument::where('id','=',$id)->first();
         $enseignantId=auth('sanctum')->user()->id;
         
         if($document){
             $studentId=$document->student_id;
-            $student=Student::where('id','=',$studentId)->get();
+            $student=Student::where('id','=',$studentId)->first();
             if($student){
                 $matiereId=$document->matiere_id;
-                $classeId=$student->flatten()->pluck('classe_id')->all();
+                $classes=EtudiantClasse::where('student_id','=',$student->id)->get('classe_id');
+                foreach($classes as $classe){
+                    $clss=Classe::where('id','=',$classe->classe_id)->where('type_id','=',1)->first();
+                    if($clss){
+                     $classeId=$clss->id;
+                    }
+                }
                 $emc = EnseignantMatiere::where('enseignant_id', '=', $enseignantId)
                         ->where('matiere_id', '=', $matiereId)
                         ->whereExists(function ($query) use ($enseignantId, $classeId) {
@@ -242,6 +254,7 @@ class ClassDocumentController extends Controller
                         ->get();
 
                 if(count($emc)>0){
+                    unlink(storage_path().'/app/public/'.$document->rapport);
                     $document->delete();
                     return response([
                         'message'=>'Document supprimé avec succès'

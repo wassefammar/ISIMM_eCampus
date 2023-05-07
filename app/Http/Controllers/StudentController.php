@@ -13,6 +13,78 @@ use Illuminate\Support\Facades\Storage;
 class StudentController extends Controller
 {
     //
+    public function indexForRegister(){
+        return response([
+            'classes'=>Classe::where('type_id','=',1)->get('nom')
+        ],200);
+    }
+
+    public function listEtudiants(){
+        $etudiants=Student::with('classe:id,nom')->get(['id','nom','prenom','image','email','telephone']);
+        if(count($etudiants)>0){
+            return response([
+                'message'=>'Voila la liste des étudiants',
+                'etudiants'=>$etudiants
+            ],200);
+        }
+        else{
+            return response([
+                'message'=>"pas d'étudiants pour le moment"
+            ],404);
+        }
+    }
+
+    public function modifierEtudiant(Request $request, $id){
+      $etudiant=Student::where('id','=',$id)->first();
+      if($etudiant){
+        $attrs= $request->validate([
+            'name'=>'required|string',
+            'prenom'=>'required|string',
+            'email'=>'required|string',
+            'image'=>'required|image|mimes:jpeg,png,jpg,svg'
+        ]);
+        if(Student::where('id','!=',$id)->where(['email'=>$attrs['email']])->exists()){
+            return response([
+                'message'=>'email déja existant'
+            ],409);
+        }else{ 
+            $imageName= Str::random(20).".".$attrs['image']->getClientOriginalExtension(); 
+            auth('sanctum')->user()->update([
+                'nom'=>$attrs['name'],
+                'prenom'=>$attrs['prenom'],
+                'email'=>$attrs['email'],
+                'image'=>$imageName
+            ]);
+            Storage::disk('public')->put($imageName, file_get_contents($attrs['image']));
+           
+            return response()->json([
+                'message'=> 'Mise à jour avec succès',
+            ],200);
+        }
+      }else{
+        return response([
+            'message'=>'etudiant non existant'
+        ],404);
+      }
+    }
+
+    public function supprimerEtudiant($id) {
+
+        $etudiant=Student::where('id','=',$id)->first();
+        if($etudiant){
+            $etudiant->delete();
+            return response([
+                'message'=>'supprimé avec succès'
+            ],200);
+        }
+        else{
+            return response([
+                'message'=>'etudiant non existant'
+            ],404); 
+        }
+    }
+
+
     public function register(Request $request){
         $attrs= $request->validate([
             'name' =>'required|string',
@@ -21,36 +93,45 @@ class StudentController extends Controller
             'date_de_naissance'=>'required|date|before:today|after:1990',
             'password' => 'required|min:6|confirmed',
             'telephone'=>'required|string|min:8',
-            'image'=>'required|image|mimes:jpeg,png,jpg,svg'
+            'image'=>'required|image|mimes:jpeg,png,jpg,svg',
+            'classe'=>'required|string'
         ]);
-       // $etudiantf=Student::where('email',$attrs['email'])->get();
-        if(Student::where('email',$attrs['email'])->exists()){
-            return response([
-                'message'=>'email déja existant'
-            ],409);
-        }else{
-            $imageName= Str::random(20).".".$attrs['image']->getClientOriginalExtension();
-            $etudiant= Student::create([
-                'nom'=>$attrs['name'],
-                'email'=>$attrs['email'],
-                'prenom'=>$attrs['prenom'],
-                'date_de_naissance'=>$attrs['date_de_naissance'],
-                'password'=>bcrypt($attrs['password']),
-                'telephone'=>$attrs['telephone'],
-                'image'=>$imageName
-            ]);
-            if($etudiant){
-                Storage::disk('public')->put($imageName, file_get_contents($attrs['image']));
+        $classe=Classe::where('nom','=',$attrs['classe'])->where('type_id','=',1)->first('id');
+        if($classe){
+            if(Student::where('email',$attrs['email'])->exists()){
                 return response([
-                    'message'=>'Compte créé avec succès',
-                ],200);
+                    'message'=>'email déja existant'
+                ],409);
             }else{
-                return response([
-                    'message'=>'Oops.. il ya un problème',
-                ],500);
+                $imageName= Str::random(20).".".$attrs['image']->getClientOriginalExtension();
+                $etudiant= Student::create([
+                    'nom'=>$attrs['name'],
+                    'email'=>$attrs['email'],
+                    'prenom'=>$attrs['prenom'],
+                    'date_de_naissance'=>$attrs['date_de_naissance'],
+                    'password'=>bcrypt($attrs['password']),
+                    'telephone'=>$attrs['telephone'],
+                    'image'=>$imageName
+                ]);
+                if($etudiant){
+                    Storage::disk('public')->put($imageName, file_get_contents($attrs['image']));
+                    $etudiant->classe()->attach($classe->id);
+                    return response([
+                        'message'=>'Compte créé avec succès',
+                    ],200);
+                }else{
+                    return response([
+                        'message'=>'Oops.. il ya un problème',
+                    ],500);
+                }
+    
             }
-
+        }else{
+            return response([
+                'message'=>'classe inexistante'
+            ],404);
         }
+
        
     }
 

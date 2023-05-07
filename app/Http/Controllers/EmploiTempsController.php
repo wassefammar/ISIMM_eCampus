@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Classe;
+use App\Models\EtudiantClasse;
 use App\Models\Student;
 use App\Models\EmploiTemps;
 use App\Models\EmploiSeance;
@@ -17,7 +18,14 @@ class EmploiTempsController extends Controller
       $etudiantId=auth('sanctum')->user()->id;
 
       $classeId=Student::where('id','=',$etudiantId)->first();
-      $EmploiId=EmploiTemps::where('classe_id','=',$classeId->classe_id)->first();
+      $classes=EtudiantClasse::where('etudiant_id','=',$etudiantId)->get('classe_id');
+      foreach($classes as $classe){
+          $clss=Classe::where('id','=',$classe->classe_id)->where('type_id','=',1)->first();
+          if($clss){
+           $classeId=$clss->id;
+          }
+      }
+      $EmploiId=EmploiTemps::where('classe_id','=',$classeId)->first();
       $sessionIds=EmploiSeance::where('emploi_temps_id','=',$EmploiId->id)->get();
       for($i=0;$i<count($sessionIds);$i++){
         $seances[$i]=SessionMatiere::where('id','=',$sessionIds[$i]['session_matiere_id'])->first();

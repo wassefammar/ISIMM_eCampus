@@ -29,7 +29,12 @@ class AnnonceController extends Controller
                     }
                 }
                 elseif($annonces[$i]->type_user==="etudiant"){
-                    $proprietaires[$i]=Student::where('id','=',$annoncesIds[$i]->proprietare_id)->first(['id','classe_id','nom','prenom','image']);
+                    $proprietaires[$i]=Student::where('id','=',$annoncesIds[$i]->proprietare_id)
+                                              ->with(['classe'=>function($query){
+                                                   $query->select('id','classe_id')
+                                                         ->with('classe:id,nom');
+                                                }])
+                                              ->first(['id','nom','prenom','image']);
                     $submasques[$i]=Classe::where('id','=',$proprietaires[$i]->classe_id)->first('nom');
 
                 }
@@ -180,23 +185,35 @@ class AnnonceController extends Controller
    
     public function storeForAdmins(Request $request){
         $attrs=$request->validate([
-        'titre'=>'string',
-        'description'=>'required|string',
-        'image'=>'file'
-        ]);
-        $proprietaireId=auth('sanctum')->user()->id;
-        $proprietaireType=3;
-        if($attrs['image']!=null){
+            'titre'=>'string',
+            'description'=>'required|string',
+            'image'=>'file'
+         ]);
+         $proprietaireId=auth('sanctum')->user()->id;
+         $proprietaireType=3;
+         if($request->hasFile('image')){
             $imageName= Str::random(20).".".$attrs['image']->getClientOriginalExtension();
-            $annonce=Annonce::create([
-                'proprietaire_id'=>$proprietaireId,
-                'type_user'=>$proprietaireType,
-                'description'=>$attrs['description'],
-                'titre'=>$attrs['titre'],
-                'image'=>$imageName
-            ]);
+ 
+            if($request->has('titre')){
+             $annonce=Annonce::create([
+                 'proprietare_id'=>$proprietaireId,
+                 'type_user'=>$proprietaireType,
+                 'description'=>$attrs['description'],
+                 'titre'=>$attrs['titre'],
+                 'image'=>$imageName
+              ]);
+            }
+            else{
+             $annonce=Annonce::create([
+                 'proprietare_id'=>$proprietaireId,
+                 'type_user'=>$proprietaireType,
+                 'description'=>$attrs['description'],
+                 'image'=>$imageName
+              ]);
+            }
+          
             if($annonce){
-                Storage::disk('public/annonces')->put($imageName, file_get_contents($attrs['image']));
+                Storage::disk('public')->put($imageName, file_get_contents($attrs['image']));
                 return response([
                     'message'=>'Annonce créé avec succès',
                 ],200);
@@ -205,15 +222,25 @@ class AnnonceController extends Controller
                     'message'=>'Oops.. problème'
                 ],500);
             }
-
-        } else{
-            $annonce=Annonce::create([
-                'proprietaire_id'=>$proprietaireId,
-                'type_user'=>$proprietaireType,
-                'description'=>$attrs['description'],
-                'titre'=>$attrs['titre'],
-                'image'=>null
-            ]);
+ 
+         }else{
+            if($request->has('titre')){
+             $annonce=Annonce::create([
+                 'proprietaire_id'=>$proprietaireId,
+                 'type_user'=>$proprietaireType,
+                 'description'=>$attrs['description'],
+                 'titre'=>$attrs['titre'],
+                 'image'=>null
+              ]);
+            }
+            else{
+             $annonce=Annonce::create([
+                 'proprietare_id'=>$proprietaireId,
+                 'type_user'=>$proprietaireType,
+                 'description'=>$attrs['description'],
+                 'image'=>null
+              ]);
+            }
             if($annonce){
                 return response([
                     'message'=>'Annonce créé avec succès',
@@ -223,7 +250,7 @@ class AnnonceController extends Controller
                     'message'=>'Oops.. problème'
                 ],500);
             }
-        }
+         }
 
     }
 

@@ -13,10 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('classes', function (Blueprint $table) {
+        Schema::create('rapport_p_f_e_s', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('type_id')->constrained('type_classes')->cascadeOnDelete();
-            $table->string('nom');
+            $table->string('titre');
+            $table->string('description')->nullable();
+            $table->string('annee');
+            $table->string('fichier');
             $table->timestamps();
         });
     }
@@ -28,6 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('classes');
+        Schema::dropIfExists('rapport_p_f_e_s');
     }
 };

@@ -46,6 +46,7 @@ class SessionMatiereController extends Controller
             'matiere_id'=>'required|integer',
             'classe_id'=>'required|integer',
             'enseignant_id'=>'required|integer',
+            'day'=>'string|required',
             'start_time'=>'required|date_format:H:i:s',
             'end_time'=>'required|date_format:H:i:s'
         ]);
@@ -76,6 +77,7 @@ class SessionMatiereController extends Controller
                     'matiere_id'=>$matiereId,
                     'classe_id'=>$classeId,
                     'enseignant_id'=>$enseignantId,
+                    'day'=>$attrs['day'],
                     'startTime'=>$attrs['start_time'],
                     'endTime'=>$attrs['end_time']
     

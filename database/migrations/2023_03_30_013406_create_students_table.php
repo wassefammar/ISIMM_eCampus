@@ -15,7 +15,6 @@ return new class extends Migration
     {
         Schema::create('students', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('classe_id')->constrained('classes')->cascadeOnDelete();
             $table->string('nom');
             $table->string('prenom');
             $table->string('email')->unique();

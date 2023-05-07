@@ -15,10 +15,15 @@ class Classe extends Model
     protected $table="classes";
     
     protected $fillable=[
-        'nom'
+        'nom',
+        'type_id'
     ];
+
+    public function type(){
+        return $this->belongsTo(TypeClasse::class, 'type_id');
+    }
     public function etudiants(){
-        return $this->hasMany(Student::class, 'classe_id');
+        return $this->belongsToMany(Student::class, 'etudiant_classes');
     }
 
     public function enseignants()

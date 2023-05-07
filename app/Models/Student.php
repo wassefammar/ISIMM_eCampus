@@ -25,7 +25,7 @@ class Student extends Authenticatable
         'image'
     ];
     public function classe(){
-        return $this->belongsTo(Classe::class, 'classe_id');
+        return $this->belongsToMany(Classe::class, 'etudiant_classes');
     }
 
     public function matieres()

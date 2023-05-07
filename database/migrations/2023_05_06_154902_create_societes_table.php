@@ -13,10 +13,15 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('classes', function (Blueprint $table) {
+        Schema::create('societes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('type_id')->constrained('type_classes')->cascadeOnDelete();
             $table->string('nom');
+            $table->string('image');
+            $table->string('a_propos');
+            $table->string('adresse');
+            $table->string('email')->unique();
+            $table->string('telephone');
+            $table->string('site_web');
             $table->timestamps();
         });
     }
@@ -28,6 +33,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('classes');
+        Schema::dropIfExists('societes');
     }
 };
