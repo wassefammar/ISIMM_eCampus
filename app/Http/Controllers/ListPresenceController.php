@@ -49,7 +49,7 @@ class ListPresenceController extends Controller
         $etudiantIds=EtudiantClasse::where('classe_id','=',$classeId)->get('student_id');
         $i=0;
         foreach($etudiantIds as $etudiantId){
-            $etudiants[$i]=Student::where('id','=',$etudiantId->student_id)->get(['id','nom','prenom', 'image']);
+            $etudiants[$i]=Student::where('id','=',$etudiantId->student_id)->first(['id','nom','prenom', 'image']);
             $i++;
         }
         if (count($etudiants)>0) {

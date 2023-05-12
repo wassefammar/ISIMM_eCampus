@@ -7,7 +7,6 @@ use App\Http\Controllers\PFEBookController;
 use App\Http\Controllers\RapportPFEController;
 use App\Http\Controllers\ResultatController;
 use App\Http\Controllers\SocieteController;
-use App\Models\RapportPFE;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\AdminController;
@@ -48,7 +47,7 @@ Route::post('register_admin',[AdminController::class, 'register']);
 Route::post('login',[LoginController::class, 'login']);
 Route::post('logout',[LoginController::class, 'logout'])->middleware('auth:sanctum');
 
-Route::get('students',[StudentController::class, 'fiit']);
+//Route::get('students',[StudentController::class, 'fiit']);
 
 //les matieres
 
@@ -110,8 +109,7 @@ Route::delete('supprimer_epreuve/{id}',[EpreuveController::class, 'destroy'])->m
 
 //les résultats
 Route::get('mes_resultats',[ResultatController::class, 'index'])->middleware('auth:sanctum');
-Route::post('ajouter_resultat',[ResultatController::class, 'store'])->middleware('auth:sanctum');
-Route::patch('update_resultat/{id}',[ResultatController::class, 'update'])->middleware('auth:sanctum');
+Route::post('confirmer_resultat',[ResultatController::class, 'store'])->middleware('auth:sanctum');
 Route::delete('supprimer_resultat/{id}',[ResultatController::class, 'destroy'])->middleware('auth:sanctum');
 
 
@@ -177,7 +175,12 @@ Route::post('ajouter_remarque', [RemarqueController::class, 'store'])->middlewar
 Route::post('update_remarque/{id}',[RemarqueController::class,'update'])->middleware('auth:sanctum');
 Route::delete('supprimer_remarques/{id}',[RemarqueController::class, 'destroy'])->middleware('auth:sanctum');
 
+//mes seances
+Route::get('mes_seances',[EmploiTempsController::class, 'indexForEnseignants'])->middleware('auth:sanctum');
+Route::get('emploi_temps',[EmploiTempsController::class, 'indexForStudents'])->middleware('auth:sanctum');
 
+//annonces
+Route::delete('supprimer_annonce/{id}',[AnnonceController::class, 'destroy'])->middleware('auth:sanctum');
 
 
 /****Groupe des apis liées aux etudiants */
@@ -195,8 +198,7 @@ Route::delete('supprimer_remarques/{id}',[RemarqueController::class, 'destroy'])
    Route::delete('supprimer_document/{id}', [ClassDocumentController::class, 'destroy'])->middleware('auth:sanctum');
 
    //annonces
-   Route::delete('supprimer_annonce/{id}',[AnnonceController::class, 'destroy'])->middleware('auth:sanctum');
-   Route::post('enseignant/ajouter_annonce',[AnnonceController::class, 'storeForEnseignants'])->middleware('auth:sanctum');
+   Route::post('etudiant/ajouter_annonce',[AnnonceController::class, 'storeForEnseignants'])->middleware('auth:sanctum');
 
 
 

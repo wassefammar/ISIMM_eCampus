@@ -7,6 +7,7 @@ use App\Models\Enseignant;
 use App\Models\Epreuve;
 use App\Models\EtudiantClasse;
 use App\Models\Matiere;
+use App\Models\Salle;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use App\Models\EnseignantMatiere;
@@ -19,11 +20,13 @@ class EpreuveController extends Controller
         $enseignants=Enseignant::all(['id','nom','prenom']);
         $classes=Classe::all(['id','nom']);
         $matieres=Matiere::all(['id','nom']);
+        $salles=Salle::all(['id','nom']);
 
         return response([
             'classes'=>$classes,
             'matieres'=>$matieres,
-            'enseignants'=>$enseignants
+            'enseignants'=>$enseignants,
+            'salles'=>$salles
         ],200);
       
     }
@@ -50,7 +53,11 @@ class EpreuveController extends Controller
                                     $query->select('id','nom');
                                 }
                             ])
-                         ->get();
+                            ->with(['salle' => function ($query) {
+                                $query->select('id','nom');
+                                  }
+                            ])
+                        ->get();
         if(count($epreuves)>0){
             return response([
                 'epreuves'=>$epreuves
@@ -70,6 +77,7 @@ class EpreuveController extends Controller
         'classe_id'=>'required|integer',
         'matiere_id'=>'required|integer',
         'enseignant_id'=>'required|integer',
+        'salle_id'=>'required|integer',
         'date'=>'required|date_format:Y-m-d',
         'startTime'=>'required|date_format:H:i:s',
         'endTime'=>'required|date_format:H:i:s'
@@ -101,6 +109,7 @@ class EpreuveController extends Controller
                 'classe_id'=>$classeId,
                 'matiere_id'=>$matiereId,
                 'enseignant_id'=>$enseignantId,
+                'salle_id'=>$attrs['salle_id'],
                 'date'=>$attrs['date'],
                 'startTime'=>$attrs['startTime'],
                 'endTime'=>$attrs['endTime']
@@ -109,6 +118,7 @@ class EpreuveController extends Controller
                 $epreuve->matiere()->associate($matiereId);
                 $epreuve->enseignant()->associate($enseignantId);
                 $epreuve->classe()->associate($classeId);
+                $epreuve->salle()->associate($attrs['salle_id']);
 
                 return response([
                     'message'=>'epreuve créé avec succès'

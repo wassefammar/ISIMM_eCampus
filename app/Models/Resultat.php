@@ -12,16 +12,21 @@ class Resultat extends Model
     protected $table="resultats";
 
     protected $fillable=[
-        'epreuve_id',
-        'etudiant_id',
-        'note'
+        'matiere_id',
+        'student_id',
+        'note_TD',
+        'note_TP',
+        'note_DS',
+        'note_Examen',
+        'moyenne',
+        'credit'
     ];
 
-    public function epreuve(){
-        return $this->belongsTo(Epreuve::class, 'epreuve_id');
+    public function matiere(){
+        return $this->belongsTo(Matiere::class, 'matiere_id');
     }
 
     public function etudiant(){
-        return $this->belongsTo(Student::class, 'etudiant_id');
+        return $this->belongsTo(Student::class, 'student_id');
     }
 }

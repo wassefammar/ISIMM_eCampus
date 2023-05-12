@@ -28,7 +28,7 @@ class PFEBookController extends Controller
 
 
     public function index(){
-        $PFE_Book=PFEBook::all()->sortDesc();
+        $PFE_Book=PFEBook::with('societe:id,nom')->orderBy('updated_at','desc')->get();
         if(count($PFE_Book)>0){
             return response([
                 'message'=>'voilà les PFE Book',
@@ -60,9 +60,16 @@ class PFEBookController extends Controller
                     'societe_id'=>$societe->id,
                     'fichier'=>$fileName
                 ]);
-                return response([
-                    'message'=>'PFE Book ajouté avec succès',
-                ],200);
+                if($fichier){
+                    Storage::disk('public')->put($fileName, file_get_contents($attrs['rapport']));
+                    return response([
+                        'message'=>'PFE Book ajouté avec succès',
+                    ],200);
+                }else{
+                    return response([
+                        'message'=>'Oops.. il ya un problème',
+                    ],500);
+                }
             }
             else{
                 $fichier=PFEBook::create([

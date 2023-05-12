@@ -14,6 +14,7 @@ class Epreuve extends Model
         'classe_id',
         'matiere_id',
         'enseignant_id',
+        'salle_id',
         'date',
         'startTime',
         'endTime'
@@ -29,6 +30,10 @@ class Epreuve extends Model
 
     public function enseignant(){
         return $this->belongsTo(Enseignant::class, 'enseignant_id');
+    }
+
+    public function salle(){
+        return $this->belongsTo(Salle::class, 'salle_id');
     }
 
 

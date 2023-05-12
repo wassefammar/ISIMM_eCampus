@@ -5,8 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class MatiereClasse extends Model
+class Salle extends Model
 {
     use HasFactory;
-    protected $table="matiere_classes";
+    protected $table="salles";
+
+    protected $fillable=[
+        'nom'
+    ];
 }

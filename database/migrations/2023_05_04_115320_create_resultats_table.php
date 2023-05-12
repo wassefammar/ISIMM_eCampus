@@ -15,9 +15,14 @@ return new class extends Migration
     {
         Schema::create('resultats', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('epreuve_id')->constrained('epreuves')->cascadeOnDelete();
-            $table->foreignId('etudiant_id')->constrained('students')->cascadeOnDelete();
-            $table->float('note');
+            $table->foreignId('matiere_id')->constrained('matieres')->cascadeOnDelete();
+            $table->foreignId('student_id')->constrained('students')->cascadeOnDelete();
+            $table->float('note_TD')->nullable();
+            $table->float('note_TP')->nullable();
+            $table->float('note_DS')->nullable();
+            $table->float('note_Examen')->nullable();
+            $table->float('moyenne')->nullable();
+            $table->integer('credit')->nullable();
             $table->timestamps();
         });
     }

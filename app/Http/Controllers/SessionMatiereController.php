@@ -17,7 +17,7 @@ class SessionMatiereController extends Controller
             'matiere_id'=>'required|integer'
         ]);
         if(Matiere::find($attrs['matiere_id'])){
-            $sessions=SessionMatiere::where('matiere_id','=',$attrs['matiere_id'])->get();
+            $sessions=SessionMatiere::where('matiere_id','=',$attrs['matiere_id'])->with('salle:id,nom')->with('enseignant:id,nom,prenom')->get();
             if(count($sessions)>0){
                 return response([
                     'message'=>'Voila les horaires de cette matiere',
@@ -46,6 +46,7 @@ class SessionMatiereController extends Controller
             'matiere_id'=>'required|integer',
             'classe_id'=>'required|integer',
             'enseignant_id'=>'required|integer',
+            'salle_id'=>'required|integer',
             'day'=>'string|required',
             'start_time'=>'required|date_format:H:i:s',
             'end_time'=>'required|date_format:H:i:s'
@@ -77,6 +78,7 @@ class SessionMatiereController extends Controller
                     'matiere_id'=>$matiereId,
                     'classe_id'=>$classeId,
                     'enseignant_id'=>$enseignantId,
+                    'salle_id'=>$attrs['salle_id'],
                     'day'=>$attrs['day'],
                     'startTime'=>$attrs['start_time'],
                     'endTime'=>$attrs['end_time']

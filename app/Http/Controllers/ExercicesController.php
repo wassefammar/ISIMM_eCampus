@@ -145,18 +145,19 @@ class ExercicesController extends Controller
         ]);
         $fullName=$attrs['filename'].'.pdf';  
 
-        if(Exercices::where('file','!=',$fullName)->exists()){
-                return response([
-                    'message'=>'Document non existant',
-                ],404);
-        }
-        else{
+        if(Exercices::where('file','=',$fullName)->exists()){
             $fichier= storage_path().'/app/public/'. $fullName;
             $headers = array(
                 'Content-Type: application/pdf',
                 );
 
             return response()->download($fichier, $fullName, $headers);
+
+        }
+        else{
+            return response([
+                'message'=>'Document non existant',
+            ],404);
 
 
         }

@@ -8,6 +8,7 @@ use App\Models\Enseignant;
 use App\Models\EnseignantClasse;
 use App\Models\EtudiantClasse;
 use App\Models\Matiere;
+use App\Models\MatiereClasse;
 use App\Models\Student;
 use App\Models\TypeClasse;
 use Illuminate\Http\Request;
@@ -108,18 +109,28 @@ class ClasseController extends Controller
         'classe_id'=>'required|integer',
         'enseignant_id'=>'required|integer'
       ]);
+
       $matiere=Matiere::find($attrs['matiere_id']);
       $classe=Classe::find($attrs['classe_id']);
       $enseignant=Enseignant::find($attrs['enseignant_id']);
       if ($classe) {
         if ($matiere) {
              if ($enseignant) {
-                $enseignant->matieres()->attach($matiere->id);
-                $classe->matieres()->attach($matiere->id);
-                $classe->enseignants()->attach($enseignant->id);
-                return response([
-                    'message'=>'Associé avec succés.',
-                ],200);
+                if(EnseignantClasse::where('enseignant_id','=',$enseignant->id)->where('classe_id','=',$classe->id)->exists()
+                && MatiereClasse::where('matiere_id','=',$matiere->id)->where('classe_id','=',$classe->id)->exists()){
+                    return response([
+                        'message'=>'Dèja associé',
+                    ],200);
+                }
+                else{
+                    $enseignant->matieres()->attach($matiere->id);
+                    $classe->matieres()->attach($matiere->id);
+                    $classe->enseignants()->attach($enseignant->id);
+                    return response([
+                        'message'=>'Associé avec succés.',
+                    ],200);
+                }
+
 
              } else {
                 return response([

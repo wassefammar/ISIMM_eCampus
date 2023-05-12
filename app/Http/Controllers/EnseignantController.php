@@ -15,7 +15,8 @@ class EnseignantController extends Controller
 {
     //
     public function listEnseignants(){
-        $enseignants=Enseignant::with('departement')->get(['nom','prenom','image','email','telephone','departement_id']);
+        $enseignants=Enseignant::with('classes:id,nom')->with('matieres:id,nom')->get(['id','nom','prenom','image','email','telephone']);
+
         if(count($enseignants)>0){
             return response([
                 'message'=>'Voila la liste des enseignants',
@@ -47,7 +48,7 @@ class EnseignantController extends Controller
             }else{
                 $imageName= Str::random(20).".".$attrs['image']->getClientOriginalExtension(); 
       
-                auth('sanctum')->user()->update([
+                $enseignant->update([
                     'nom'=>$attrs['name'],
                     'prenom'=>$attrs['prenom'],
                     'email'=>$attrs['email'],

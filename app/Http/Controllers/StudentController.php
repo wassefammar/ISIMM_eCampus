@@ -49,7 +49,7 @@ class StudentController extends Controller
             ],409);
         }else{ 
             $imageName= Str::random(20).".".$attrs['image']->getClientOriginalExtension(); 
-            auth('sanctum')->user()->update([
+            $etudiant->update([
                 'nom'=>$attrs['name'],
                 'prenom'=>$attrs['prenom'],
                 'email'=>$attrs['email'],
@@ -140,8 +140,8 @@ class StudentController extends Controller
           'student_id'=>'required|integer',
           'classe_id'=>'required|integer'
         ]);
-        $etudiant=Student::find($attrs['student_id']);
-        $classe=Classe::find($attrs['classe_id']);
+        $etudiant=Student::where($attrs['student_id']);
+        $classe=Classe::where($attrs['classe_id'])->first();
         if ($classe) {
           if ($etudiant) {
                   $classe->etudiants()->attach($etudiant->id);
@@ -163,6 +163,33 @@ class StudentController extends Controller
         
       }
 
+      public function unAssignStudentToClass(Request $request){
+        $attrs=$request->validate([
+          'student_id'=>'required|integer',
+          'classe_id'=>'required|integer'
+        ]);
+        $etudiant=Student::find($attrs['student_id']);
+        $classe=Classe::find($attrs['classe_id']);
+        if ($classe) {
+          if ($etudiant) {
+                  $classe->etudiants()->detach($etudiant->id);
+                  return response([
+                      'message'=>'Etudiant associée avec succés.',
+                  ],200);
+  
+            } else {
+                    return response([
+                        'message'=>'Etudiant non existant',
+                    ],404);           
+                  }
+               
+        } else {
+          return response([
+              'message'=>'Classe non existante',
+          ],404);  
+        }
+        
+      }
     //Cliquer sur l'icon de profile 
     public function user(){
         $user=auth('sanctum')->user();

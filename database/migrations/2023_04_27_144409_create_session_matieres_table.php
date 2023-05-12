@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('matiere_id')->constrained('matieres')->cascadeOnDelete();
             $table->foreignId('enseignant_id')->constrained('enseignants')->cascadeOnDelete();
+            $table->foreignId('salle_id')->constrained('salles')->cascadeOnDelete();
             $table->string('day');
             $table->time('startTime');
             $table->time('endTime');
