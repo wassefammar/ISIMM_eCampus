@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ChatRoomController;
 use App\Http\Controllers\EpreuveController;
+use App\Http\Controllers\ListParticipantsController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\PFEBookController;
 use App\Http\Controllers\RapportPFEController;
@@ -97,6 +98,11 @@ Route::delete('supprimer_annonce/{id}',[AnnonceController::class, 'destroy'])->m
 Route::post('messages',[MessageController::class, 'store'])->middleware('auth:sanctum');
 Route::get('chat_rooms',[ChatRoomController::class, 'index'])->middleware('auth:sanctum');
 Route::get('messages/{id}', [MessageController::class, 'index'])->middleware('auth:sanctum');
+
+//list participants
+Route::get('list_participants',[ListParticipantsController::class, 'index'])->middleware('auth:sanctum');
+Route::post('bloquer_participant',[ListParticipantsController::class, 'blockParticipant'])->middleware('auth:sanctum');
+Route::post('ajouter_participant',[ListParticipantsController::class, 'ajouterParticipant'])->middleware('auth:sanctum');
 
 
 //les epreuves

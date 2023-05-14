@@ -336,8 +336,7 @@ class ClasseController extends Controller
         else{
             return response([
                 'message'=>'Classe inexistante'
-
-            ],200); 
+            ],404); 
         }
     }
 }
