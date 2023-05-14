@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\ChatRoom;
 use App\Models\Message;
+use App\Models\Student;
+use App\Models\StudentChatAdmin;
 use Illuminate\Http\Request;
 
 class MessageController extends Controller
@@ -23,6 +25,8 @@ class MessageController extends Controller
             ],404);
         }  
     }
+
+
     
 
     public function store(Request $request){
@@ -54,4 +58,7 @@ class MessageController extends Controller
 
 
     }
+
+
+
 }

@@ -41,22 +41,19 @@ class StudentController extends Controller
             'name'=>'required|string',
             'prenom'=>'required|string',
             'email'=>'required|string',
-            'image'=>'required|image|mimes:jpeg,png,jpg,svg'
+            'telephone'=>'required|string|min:8',
         ]);
         if(Student::where('id','!=',$id)->where(['email'=>$attrs['email']])->exists()){
             return response([
                 'message'=>'email déja existant'
             ],409);
         }else{ 
-            $imageName= Str::random(20).".".$attrs['image']->getClientOriginalExtension(); 
             $etudiant->update([
                 'nom'=>$attrs['name'],
                 'prenom'=>$attrs['prenom'],
                 'email'=>$attrs['email'],
-                'image'=>$imageName
-            ]);
-            Storage::disk('public')->put($imageName, file_get_contents($attrs['image']));
-           
+                'telephone'=>$attrs['telephone']
+            ]);           
             return response()->json([
                 'message'=> 'Mise à jour avec succès',
             ],200);

@@ -1,13 +1,6 @@
 <?php
 
-use App\Http\Controllers\ChatRoomController;
-use App\Http\Controllers\EpreuveController;
-use App\Http\Controllers\ListParticipantsController;
-use App\Http\Controllers\MessageController;
-use App\Http\Controllers\PFEBookController;
-use App\Http\Controllers\RapportPFEController;
-use App\Http\Controllers\ResultatController;
-use App\Http\Controllers\SocieteController;
+use App\Models\StudentChatAdmin;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\AdminController;
@@ -17,15 +10,25 @@ use App\Http\Controllers\ClasseController;
 use App\Http\Controllers\ExamenController;
 use App\Http\Controllers\AnnonceController;
 use App\Http\Controllers\DeslikeController;
+use App\Http\Controllers\EpreuveController;
 use App\Http\Controllers\MatiereController;
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\PFEBookController;
+use App\Http\Controllers\SocieteController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\ChatRoomController;
 use App\Http\Controllers\RemarqueController;
+use App\Http\Controllers\ResultatController;
 use App\Http\Controllers\ExercicesController;
 use App\Http\Controllers\EnseignantController;
+use App\Http\Controllers\RapportPFEController;
 use App\Http\Controllers\EmploiTempsController;
 use App\Http\Controllers\ListPresenceController;
 use App\Http\Controllers\ClassDocumentController;
 use App\Http\Controllers\SessionMatiereController;
+use App\Http\Controllers\ListParticipantsController;
+use App\Http\Controllers\StudentChatAdminController;
+use App\Http\Controllers\EnseignantChatAdminController;
 
 /*
 |--------------------------------------------------------------------------
@@ -105,6 +108,17 @@ Route::get('messages/{id}', [MessageController::class, 'index'])->middleware('au
 Route::get('list_participants',[ListParticipantsController::class, 'index'])->middleware('auth:sanctum');
 Route::post('bloquer_participant',[ListParticipantsController::class, 'blockParticipant'])->middleware('auth:sanctum');
 Route::post('ajouter_participant',[ListParticipantsController::class, 'ajouterParticipant'])->middleware('auth:sanctum');
+
+
+//contacter administration etudiant
+Route::get('list_chats_etudiants',[StudentChatAdminController::class, 'indexForAdmin'])->middleware('auth:sanctum');
+Route::post('repondre_etudiant',[StudentChatAdminController::class, 'repondreEtudiant'])->middleware('auth:sanctum');
+Route::post('contacter_admin',[StudentChatAdminController::class, 'contacterAdmin'])->middleware('auth:sanctum');
+
+//contacter administration etudiant
+Route::get('list_chats_enseignants',[EnseignantChatAdminController::class, 'indexForAdmin'])->middleware('auth:sanctum');
+Route::post('repondre_enseignant',[EnseignantChatAdminController::class, 'repondreEtudiant'])->middleware('auth:sanctum');
+Route::post('enseignant/contacter_admin',[EnseignantChatAdminController::class, 'contacterAdmin'])->middleware('auth:sanctum');
 
 
 //les epreuves
