@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Classe;
+use App\Models\EtudiantClasse;
 use App\Models\Matiere;
 use Illuminate\Http\Request;
 use App\Models\MatiereClasse;
@@ -35,6 +36,25 @@ class MatiereController extends Controller
             return response([
                 'message'=>'Oops...il y a un problème'
             ],500);   
+        }
+    }
+
+
+    public function ListMatieres(){
+        $etudiantId=auth('sanctum')->user()->id;
+        $classeIds=EtudiantClasse::where('student_id','=',$etudiantId)->get('classe_id');
+        $matiereIds=MatiereClasse::whereIn('classe_id',$classeIds)->get('matiere_id');
+        $matieres=Matiere::whereIn('id',$matiereIds)->get();
+        if(count($matieres)>0){
+            return response([
+                'message'=>'voilà la liste des matières',
+                'matières'=>$matieres
+            ],200);
+        }
+        else{
+            return response([
+                'message'=>'Pas de matières',
+            ],404);
         }
     }
 

@@ -56,7 +56,9 @@ Route::get('matieres',[MatiereController::class, 'index'])->middleware('auth:san
 Route::post('ajouter_matiere',[MatiereController::class, 'store'])->middleware('auth:sanctum');
 Route::post('ajouter_classe',[ClasseController::class, 'store'])->middleware('auth:sanctum');
 
+//liste Matiere()
 
+Route::get('list_matieres', [MatiereController::class, 'ListMatieres'])->middleware('auth:sanctum');
 //les routes des cours
 
 Route::get('cours',[CoursController::class, 'index'])->middleware('auth:sanctum');

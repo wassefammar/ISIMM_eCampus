@@ -38,24 +38,19 @@ class EnseignantController extends Controller
                 'name'=>'required|string',
                 'prenom'=>'required|string',
                 'email'=>'required|email',
-                'image'=>'required|image|mimes:jpeg,png,jpg,svg|max:1999'
+                'telephone'=>'required|string|min:8',
             ]);
             //$EnseignantIds=Enseignant::where('id','!=',auth('sanctum')->user()->id)->get(['id']);
             if(Enseignant::where('id','!=',$id)->where(['email'=>$attrs['email']])->exists()){
                 return response([
                     'message'=>'email déja existant'
                 ],409);
-            }else{
-                $imageName= Str::random(20).".".$attrs['image']->getClientOriginalExtension(); 
-      
+            }else{      
                 $enseignant->update([
                     'nom'=>$attrs['name'],
                     'prenom'=>$attrs['prenom'],
                     'email'=>$attrs['email'],
-                    'image'=>$imageName
-                ]);
-                Storage::disk('public')->put($imageName, file_get_contents($attrs['image']));
-    
+                ]);    
                 return response()->json([
                     'message'=> 'Mise à jour avec succès',
                 ],200);
@@ -186,7 +181,6 @@ class EnseignantController extends Controller
             'email'=>'required|email',
             'image'=>'required|image|mimes:jpeg,png,jpg,svg|max:1999'
         ]);
-        //$EnseignantIds=Enseignant::where('id','!=',auth('sanctum')->user()->id)->get(['id']);
         if(Enseignant::where('id','!=',auth('sanctum')->user()->id)->where(['email'=>$attrs['email']])->exists()){
             return response([
                 'message'=>'email déja existant'
@@ -209,12 +203,4 @@ class EnseignantController extends Controller
         }
     }
 
-    /* public function assignSubject(Request $request, Enseignant $enseignant)
-    {   
-        $attrs=$request->validate([
-         
-        ]);
-        $matiere = Matiere::findOrFail($attrs['matiere']);
-        $enseignant->assignMatiere($matiere);
-    } */
 }

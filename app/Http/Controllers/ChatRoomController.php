@@ -15,7 +15,6 @@ class ChatRoomController extends Controller
         if(count($classeIds)>0){
             for($i=0;$i<count($classeIds);$i++){
                 $chatRooms[$i]=ChatRoom::where('classe_id','=',$classeIds[$i]->classe_id)
-                                    ->whereHas('messages')
                                     ->with('lastmessages')
                                     ->latest('updated_at')
                                     ->first();
