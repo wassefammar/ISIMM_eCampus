@@ -44,6 +44,7 @@ class EnseignantChatAdminController extends Controller
                'enseignant_chat_admin_id'=>$chatId,
                'admin_id'=>$adminId->id,
                'enseignant_id'=>$etudiantId,
+               'sender_id'=>auth('sanctum')->user()->id,
                'text'=>$attrs['text']
            ]);
            if($message){
@@ -68,6 +69,7 @@ class EnseignantChatAdminController extends Controller
                    'enseignant_chat_admin_id'=>$chatId,
                    'admin_id'=>$adminId->id,
                    'enseignant_id'=>$etudiantId,
+                   'sender_id'=>auth('sanctum')->user()->id,
                    'text'=>$attrs['text']
                ]);
                if($message){
@@ -104,6 +106,7 @@ class EnseignantChatAdminController extends Controller
                'enseignant_chat_admin_id'=>$attrs['chat_id'],
                'admin_id'=>auth('sanctum')->user()->id,
                'enseignant_id'=>$chat->enseignant_id,
+               'sender_id'=>auth('sanctum')->user()->id,
                'text'=>$attrs['text']
            ]);
            if($message){
@@ -124,6 +127,7 @@ class EnseignantChatAdminController extends Controller
        $messages=ContactEnseignantAdmin::where('enseignant_chat_admin_id',$chat->id)
                                     ->with('enseignant:id,nom,prenom,image')
                                     ->with('admin:id,nom,prenom,image')
+                                    ->orderBy('updated_at')
                                     ->get();
 
           if(count($messages)>0){

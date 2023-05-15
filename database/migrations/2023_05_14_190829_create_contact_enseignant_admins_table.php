@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('enseignant_chat_admin_id')->constrained('enseignant_chat_admins')->cascadeOnDelete();
             $table->foreignId('enseignant_id')->constrained('enseignants')->cascadeOnDelete();
             $table->foreignId('admin_id')->constrained('admins')->cascadeOnDelete();
+            $table->unsignedBigInteger('sender_id');
             $table->string('text');
             $table->timestamps();
         });

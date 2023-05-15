@@ -15,6 +15,7 @@ class ContactEtudiantAdmin extends Model
         'student_chat_admin_id',
         'student_id',
         'admin_id',
+        'sender_id',
         'text'
     ];
 
