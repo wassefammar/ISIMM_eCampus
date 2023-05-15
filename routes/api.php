@@ -110,12 +110,14 @@ Route::post('bloquer_participant',[ListParticipantsController::class, 'blockPart
 Route::post('ajouter_participant',[ListParticipantsController::class, 'ajouterParticipant'])->middleware('auth:sanctum');
 
 
-//contacter administration etudiant
+//contacter administration etudiant chatMessages
+Route::get('chat_messages_etudiant/{id}',[StudentChatAdminController::class, 'chatMessages'])->middleware('auth:sanctum');
 Route::get('list_chats_etudiants',[StudentChatAdminController::class, 'indexForAdmin'])->middleware('auth:sanctum');
 Route::post('repondre_etudiant',[StudentChatAdminController::class, 'repondreEtudiant'])->middleware('auth:sanctum');
 Route::post('contacter_admin',[StudentChatAdminController::class, 'contacterAdmin'])->middleware('auth:sanctum');
 
 //contacter administration etudiant
+Route::get('chat_messages_enseignant/{id}',[EnseignantChatAdminController::class, 'chatMessages'])->middleware('auth:sanctum');
 Route::get('list_chats_enseignants',[EnseignantChatAdminController::class, 'indexForAdmin'])->middleware('auth:sanctum');
 Route::post('repondre_enseignant',[EnseignantChatAdminController::class, 'repondreEtudiant'])->middleware('auth:sanctum');
 Route::post('enseignant/contacter_admin',[EnseignantChatAdminController::class, 'contacterAdmin'])->middleware('auth:sanctum');

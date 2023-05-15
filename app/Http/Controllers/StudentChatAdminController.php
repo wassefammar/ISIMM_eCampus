@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Admin;
 use App\Models\ContactEtudiantAdmin;
-use App\Models\Message;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use App\Models\StudentChatAdmin;
@@ -118,6 +117,35 @@ class StudentChatAdminController extends Controller
                 ]);
             }
         }
+    }
+
+
+
+    public function chatMessages($id){
+      $chat=StudentChatAdmin::where('id','=',$id)->first();
+      if($chat){
+         $messages=ContactEtudiantAdmin::where('student_chat_admin_id',$chat->id)
+                                      ->with('etudiant:id,nom,prenom,image')
+                                      ->with('admin:id,nom,prenom,image')
+                                      ->get();
+
+            if(count($messages)>0){
+                return response([
+                    'message'=>'voilà la liste des messages',
+                    'messages'=>$messages
+                ],200);
+            } 
+            else{
+                return response([
+                    'message'=>'chat vide',
+                ],200);
+            }                            
+        }
+        else{
+            return response([
+                'message'=>'chat inexistant',
+            ],404);
+        } 
     }
 
 

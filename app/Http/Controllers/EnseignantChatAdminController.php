@@ -117,4 +117,33 @@ class EnseignantChatAdminController extends Controller
            }
        }
    }
+
+   public function chatMessages($id){
+    $chat=EnseignantChatAdmin::where('id','=',$id)->first();
+    if($chat){
+       $messages=ContactEnseignantAdmin::where('enseignant_chat_admin_id',$chat->id)
+                                    ->with('enseignant:id,nom,prenom,image')
+                                    ->with('admin:id,nom,prenom,image')
+                                    ->get();
+
+          if(count($messages)>0){
+              return response([
+                  'message'=>'voilà la liste des messages',
+                  'messages'=>$messages
+              ],200);
+          } 
+          else{
+              return response([
+                  'message'=>'chat vide',
+              ],200);
+          }                            
+      }
+      else{
+          return response([
+              'message'=>'chat inexistant',
+          ],404);
+      } 
+  }
+
+
 }
