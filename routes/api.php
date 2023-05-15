@@ -200,6 +200,8 @@ Route::delete('supprimer_remarques/{id}',[RemarqueController::class, 'destroy'])
 //mes seances
 Route::get('mes_seances',[EmploiTempsController::class, 'indexForEnseignants'])->middleware('auth:sanctum');
 Route::get('emploi_temps',[EmploiTempsController::class, 'indexForStudents'])->middleware('auth:sanctum');
+//admin
+Route::get('emploi_classe',[EmploiTempsController::class, 'indexForAdmins'])->middleware('auth:sanctum');
 
 //annonces
 Route::delete('supprimer_annonce/{id}',[AnnonceController::class, 'destroy'])->middleware('auth:sanctum');

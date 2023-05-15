@@ -33,7 +33,7 @@ class EmploiTempsController extends Controller
       for($i=0;$i<count($sessionIds);$i++){
         $seances[$i]=SessionMatiere::where('id','=',$sessionIds[$i]->session_matiere_id)
                                    ->with('salle:id,nom')
-                                   ->with('enseignant:id,nom')
+                                   ->with('enseignant:id,nom,prenom')
                                    ->with('matiere:id,nom')
                                    ->first();
       }
@@ -54,6 +54,7 @@ class EmploiTempsController extends Controller
     public function indexForEnseignants(){
         $enseignantId=auth('sanctum')->user()->id;
         $sessions=SessionMatiere::where('enseignant_id','=',$enseignantId)
+                                ->whereHas('emploi_temps')
                                 ->with('salle:id,nom')
                                 ->with(['emploi_temps' => function ($query) {
                                     $query->select('emploi_temps_id', 'classe_id')
@@ -76,6 +77,47 @@ class EmploiTempsController extends Controller
             ],404);
         }
 
+    }
+
+    public function indexForAdmins(Request $request){
+        $attrs=$request->validate([
+            'classe_id'=>'required|integer'
+        ]);
+
+        $classeId=Classe::where('id','=',$attrs['classe_id'])->first();
+
+        if($classeId){
+            $emploi=EmploiTemps::where('classe_id','=',$classeId->id)->first();
+            if($emploi){
+                $seances=array();
+                $sessionIds=EmploiSeance::where('emploi_temps_id','=',$emploi->id)->get();
+                for($i=0;$i<count($sessionIds);$i++){
+                  $seances[$i]=SessionMatiere::where('id','=',$sessionIds[$i]->session_matiere_id)
+                                             ->with('salle:id,nom')
+                                             ->with('enseignant:id,nom,prenom')
+                                             ->with('matiere:id,nom')
+                                             ->first();
+                }
+                if(count($seances)>0){
+                   return response([
+                      'message'=>"Voila l'emploi",
+                      'seances'=>$seances
+          
+                   ],200);
+                } else{
+                  return response([
+                      'message'=>'emploi vide pour le moment',
+                   ],404);
+                }   
+            }else{
+                return response([
+                    'message'=>'emploi non existant',
+                 ],404);
+            }
+        }
+        return response([
+            'message'=>'classe non existant',
+         ],404);
     }
 
 
