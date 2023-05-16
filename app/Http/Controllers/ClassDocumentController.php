@@ -254,7 +254,7 @@ class ClassDocumentController extends Controller
                         ->get();
 
                 if(count($emc)>0){
-                    unlink(storage_path().'/app/public/'.$document->rapport);
+                    unlink(storage_path().'/app/public/'.$document->file);
                     $document->delete();
                     return response([
                         'message'=>'Document supprimé avec succès'

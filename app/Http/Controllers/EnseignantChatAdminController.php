@@ -12,7 +12,7 @@ class EnseignantChatAdminController extends Controller
 {
     //
     public function indexForAdmin(){
-        $chats=EnseignantChatAdmin::with('enseignant:id,nom,prenom,image')->with('lastmessage')->orderBy('updated_at')->get();
+        $chats=EnseignantChatAdmin::with('enseignant:id,nom,prenom,image')->with('lastmessage')->orderBy('updated_at', 'desc')->get();
 
         if(count($chats)>0){
           return response([
@@ -127,7 +127,7 @@ class EnseignantChatAdminController extends Controller
        $messages=ContactEnseignantAdmin::where('enseignant_chat_admin_id',$chat->id)
                                     ->with('enseignant:id,nom,prenom,image')
                                     ->with('admin:id,nom,prenom,image')
-                                    ->orderBy('updated_at')
+                                    ->orderBy('updated_at', 'desc')
                                     ->get();
 
           if(count($messages)>0){

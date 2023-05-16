@@ -128,10 +128,10 @@ class StudentChatAdminController extends Controller
       $chat=StudentChatAdmin::where('id','=',$id)->first();
       if($chat){
          $messages=ContactEtudiantAdmin::where('student_chat_admin_id',$chat->id)
-                                      ->with('etudiant:id,nom,prenom,image')
-                                      ->with('admin:id,nom,prenom,image')
-                                      ->orderBy('updated_at')
-                                      ->get();
+                                       ->with('etudiant:id,nom,prenom,image')
+                                       ->with('admin:id,nom,prenom,image')
+                                       ->orderBy('updated_at', 'desc')
+                                       ->get();
 
             if(count($messages)>0){
                 return response([

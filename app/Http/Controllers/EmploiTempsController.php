@@ -27,21 +27,80 @@ class EmploiTempsController extends Controller
 
       }
    
-      $seances=array();
+      //$seances=array();
+      $seancesLundi=array();
+      $seancesMardi=array();
+      $seancesMercredi=array();
+      $seancesJeudi=array();
+      $seancesVendredi=array();
+      $seancesSamedi=array();
       $EmploiId=EmploiTemps::where('classe_id','=',$classeId)->first();
       $sessionIds=EmploiSeance::where('emploi_temps_id','=',$EmploiId->id)->get();
       for($i=0;$i<count($sessionIds);$i++){
-        $seances[$i]=SessionMatiere::where('id','=',$sessionIds[$i]->session_matiere_id)
+        $seancesLundi[$i]=SessionMatiere::where('id','=',$sessionIds[$i]->session_matiere_id)
+                                   ->where('day', '=', 'lundi')
+                                   ->orderBy('startTime','asc')
                                    ->with('salle:id,nom')
                                    ->with('enseignant:id,nom,prenom')
                                    ->with('matiere:id,nom')
                                    ->first();
       }
-      if(count($seances)>0){
+      for($i=0;$i<count($sessionIds);$i++){
+        $seancesMardi[$i]=SessionMatiere::where('id','=',$sessionIds[$i]->session_matiere_id)
+                                   ->where('day', '=', 'mardi')
+                                   ->orderBy('startTime','asc')
+                                   ->with('salle:id,nom')
+                                   ->with('enseignant:id,nom,prenom')
+                                   ->with('matiere:id,nom')
+                                   ->first();
+      }
+      for($i=0;$i<count($sessionIds);$i++){
+        $seancesMercredi[$i]=SessionMatiere::where('id','=',$sessionIds[$i]->session_matiere_id)
+                                   ->where('day', '=', 'mercredi')
+                                   ->orderBy('startTime','asc')
+                                   ->with('salle:id,nom')
+                                   ->with('enseignant:id,nom,prenom')
+                                   ->with('matiere:id,nom')
+                                   ->first();
+      }
+      for($i=0;$i<count($sessionIds);$i++){
+        $seancesJeudi[$i]=SessionMatiere::where('id','=',$sessionIds[$i]->session_matiere_id)
+                                   ->where('day', '=', 'jeudi')
+                                   ->orderBy('startTime','asc')
+                                   ->with('salle:id,nom')
+                                   ->with('enseignant:id,nom,prenom')
+                                   ->with('matiere:id,nom')
+                                   ->first();
+      }
+      for($i=0;$i<count($sessionIds);$i++){
+        $seancesVendredi[$i]=SessionMatiere::where('id','=',$sessionIds[$i]->session_matiere_id)
+                                   ->where('day', '=', 'vendredi')
+                                   ->orderBy('startTime','asc')
+                                   ->with('salle:id,nom')
+                                   ->with('enseignant:id,nom,prenom')
+                                   ->with('matiere:id,nom')
+                                   ->first();
+      }
+      for($i=0;$i<count($sessionIds);$i++){
+        $seancesSamedi[$i]=SessionMatiere::where('id','=',$sessionIds[$i]->session_matiere_id)
+                                   ->where('day', '=', 'samedi')
+                                   ->orderBy('startTime','asc')
+                                   ->with('salle:id,nom')
+                                   ->with('enseignant:id,nom,prenom')
+                                   ->with('matiere:id,nom')
+                                   ->first();
+      }
+
+
+      if(count($seancesSamedi)>0 ||count($seancesVendredi)>0 ||count($seancesJeudi)>0|| count($seancesMercredi)>0 || count($seancesMardi)>0 || count($seancesLundi)>0){
          return response([
             'message'=>"Voila l'emploi",
-            'seances'=>$seances
-
+            'seancesLundi'=>$seancesLundi,
+            'seancesMardi'=>$seancesMardi,
+            'seancesMercredi'=>$seancesLundi,
+            'seancesJeudi'=>$seancesJeudi,
+            'seancesVendredi'=>$seancesVendredi,
+            'seancesSamedi'=>$seancesSamedi
          ],200);
       } else{
         return response([
