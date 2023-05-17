@@ -97,7 +97,7 @@ class EmploiTempsController extends Controller
             'message'=>"Voila l'emploi",
             'seancesLundi'=>$seancesLundi,
             'seancesMardi'=>$seancesMardi,
-            'seancesMercredi'=>$seancesLundi,
+            'seancesMercredi'=>$seancesMercredi,
             'seancesJeudi'=>$seancesJeudi,
             'seancesVendredi'=>$seancesVendredi,
             'seancesSamedi'=>$seancesSamedi
