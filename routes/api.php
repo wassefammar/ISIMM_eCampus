@@ -135,9 +135,7 @@ Route::delete('supprimer_epreuve/{id}',[EpreuveController::class, 'destroy'])->m
 
 
 //les résultats
-Route::get('mes_resultats',[ResultatController::class, 'index'])->middleware('auth:sanctum');
-Route::post('confirmer_resultat',[ResultatController::class, 'store'])->middleware('auth:sanctum');
-Route::delete('supprimer_resultat/{id}',[ResultatController::class, 'destroy'])->middleware('auth:sanctum');
+
 
 
 
@@ -228,6 +226,9 @@ Route::delete('supprimer_annonce/{id}',[AnnonceController::class, 'destroy'])->m
 
    //annonces
    Route::post('etudiant/ajouter_annonce',[AnnonceController::class, 'storeForEnseignants'])->middleware('auth:sanctum');
+   
+   //resultats
+   Route::get('mes_resultats',[ResultatController::class, 'indexForStudents']);
 
 
 
@@ -301,6 +302,9 @@ Route::delete('supprimer_annonce/{id}',[AnnonceController::class, 'destroy'])->m
 
     //resultat
     Route::get('list_resultats', [ResultatController::class, 'indexForAdmin']);
+    Route::get('mes_resultats',[ResultatController::class, 'index']);
+    Route::post('confirmer_resultat',[ResultatController::class, 'storee']);
+    Route::delete('supprimer_resultat/{id}',[ResultatController::class, 'destroy']);
 
     Route::post('associer_enseignant_classe', [ClasseController::class, 'AssignClassToProf']);
     Route::post('associer_matiere_classe',[MatiereController::class,'AssignMatiereToClass']);

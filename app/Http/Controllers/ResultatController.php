@@ -932,6 +932,61 @@ class ResultatController extends Controller
     }
 
 
+    public function storee(Request $request){
+        $attrs=$request->validate([
+            'matiere_id'=>'required|integer',
+          //  'resultats'=>'required|array',
+        ]);
+        $matiereId=$attrs['matiere_id'];
+      //  $resultats=$attrs['resultats'];
+        $res1=['etudiant_id'=>1,'note_TD'=>14,'note_TP'=>15,'note_DS'=>16,'note_Examen'=>17,'moyenne'=>18,'credit'=>50];
+        $res2=['etudiant_id'=>2,'note_TD'=>13,'note_TP'=>12,'note_DS'=>11,'note_Examen'=>10,'moyenne'=>9,'credit'=>50];
+        $resultats=[$res1,$res2];
+
+
+        foreach($resultats as $resultat){
+            return response(
+                $resultat
+            );
+            $etudiantId=$resultat->etudiant_id;
+            $resultat=Resultat::where('matiere_id','=',$matiereId)->where('student_id','=',)->first();
+          if($resultat){
+            $resultat->update([
+                'note_TD'=>$resultat->note_TD,
+                'note_TP'=>$resultat->note_TP,
+                'note_DS'=>$resultat->note_DS,
+                'note_Examen'=>$resultat->note_Examen,
+                'moyenne'=>$resultat->note_moyenne,
+                'credit'=>$resultat->note_credit
+            ]);
+
+          }
+          else{
+            Resultat::create([
+                'matiere_id'=>$matiereId,
+                'student_id'=>$resultat->etudiant_id,
+                'note_TD'=>$resultat->note_TD,
+                'note_TP'=>$resultat->note_TP,
+                'note_DS'=>$resultat->note_DS,
+                'note_Examen'=>$resultat->note_Examen,
+                'moyenne'=>$resultat->note_moyenne,
+                'credit'=>$resultat->note_credit
+            ]);
+          }
+        }
+
+      
+            return response([
+                'message'=>'tout les resulatats sont ajoutés'
+            ],200);
+        
+
+
+
+
+    }
+
+
 
     public function destroy($id){
         $resultat=Resultat::where('id','=',$id)->first();

@@ -11,7 +11,7 @@ class SocieteController extends Controller
 {
     //
     public function index(){
-        $societes=Societe::all()->sortDesc();
+        $societes=Societe::all();
         if(count($societes)>0){
             return response([
                 'message'=>'voilà les sociétés',
