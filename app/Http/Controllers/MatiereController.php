@@ -16,11 +16,35 @@ class MatiereController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function indexForAdmin()
     {
         //
-        $id=auth('sanctum')->user()->id;
-        $matieres=Matiere::all();
+        $matieres=Matiere::withCount('enseignants')->withCount('classes')->get();
+        if(count($matieres)>0){
+            return response([
+                'message'=>'Tous les matieres',
+                'matieres'=>$matieres
+            ],200);
+        }
+        elseif(count($matieres)==0){
+            return response([
+                'message'=>'Les matieres sont en cours de traitement'
+            ],200);
+        }
+        else{
+            return response([
+                'message'=>'Oops...il y a un problème'
+            ],500);   
+        }
+    }
+
+
+    public function indexForEnseignant()
+    {
+        //
+        $enseignantId=auth('sanctum')->user()->id;
+        $matiereIds=EnseignantMatiere::where('enseignant_id','=',$enseignantId)->get('matiere_id');
+        $matieres=Matiere::whereIn('id',$matiereIds)->get();
         if(count($matieres)>0){
             return response([
                 'message'=>'Tous les matieres',

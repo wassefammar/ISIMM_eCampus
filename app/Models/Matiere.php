@@ -19,9 +19,6 @@ class Matiere extends Model
         return $this->belongsToMany(Enseignant::class, 'enseignant_matieres');
     }
 
-    public function departement(){
-        return $this->belongsTo(Departement::class, 'departement_id');
-    }
 
     public function classes(){
         return $this->belongsToMany(Classe::class, 'matiere_classes');

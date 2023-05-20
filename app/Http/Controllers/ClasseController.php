@@ -23,7 +23,7 @@ class ClasseController extends Controller
     public function index()
     {
         //
-        $classes=Classe::all();
+        $classes=Classe::with('type:id,type')->withCount('etudiants')->get();
         if($classes){
             return response([
                 'message'=>'Voilà les classes',

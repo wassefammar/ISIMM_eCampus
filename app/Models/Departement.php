@@ -13,12 +13,13 @@ class Departement extends Model
         'nom'
     ];
 
-    public function classes(){
-        return $this->belonsToMany(Classe::class,'classe_id');
-    }
 
     public function enseignants(){
         return $this->belongsToMany(Enseignant::class,'enseignant_id');
+    }
+
+    public function chefDepartement(){
+        return $this->belongsToMany(Enseignant::class, 'chef_departements');
     }
 
 }

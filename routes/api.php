@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DepartementController;
 use App\Models\StudentChatAdmin;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LikeController;
@@ -237,6 +238,10 @@ Route::delete('supprimer_annonce/{id}',[AnnonceController::class, 'destroy'])->m
     Route::get('enseignant', [EnseignantController::class, 'user']);
     Route::post('update_enseignant', [EnseignantController::class, 'update']);
 
+    //mes matieres
+
+    Route::get('mes_matieres',[MatiereController::class, 'indexForEnseignant']);
+
     //les routes pour les document de liste d'attente
     
     Route::get('document_en_attente', [ClassDocumentController::class,'indexEnseignant']);
@@ -273,11 +278,15 @@ Route::delete('supprimer_annonce/{id}',[AnnonceController::class, 'destroy'])->m
   Route::group(['middleware'=>['auth:sanctum', 'abilities:admin']], function(){
     Route::get('admin', [AdminController::class, 'user']);
     Route::post('update_admin', [AdminController::class, 'update']);
+    Route::get('classes', [ClasseController::class, 'index']);
+    Route::get('matieres',[MatiereController::class, 'indexForAdmin']);
+    Route::get('departements', [DepartementController::class, 'index']);
     Route::post('associer_enseignant_classe', [ClasseController::class, 'AssignClassToProf']);
     Route::post('associer_matiere_classe',[MatiereController::class,'AssignMatiereToClass']);
     Route::post('desassocier_enseignant_classe',[ClasseController::class,'desassocierEnseignantClasse']);
     Route::post('associer_etudiant_classe',[ClasseController::class,'AssignStudentToClass']);
     Route::post('desassocier_etudiant_classe',[ClasseController::class,'desassocierEtudiantClasse']);
+
     //emploi
     Route::post('ajouter_emploi',[EmploiTempsController::class, 'store']);
     Route::delete('supprimer_emploi/{id}', [EmploiTempsController::class, 'destroy']);
