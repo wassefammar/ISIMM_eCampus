@@ -102,6 +102,7 @@ Route::delete('supprimer_annonce/{id}',[AnnonceController::class, 'destroy'])->m
 //Messages
 Route::post('messages',[MessageController::class, 'store'])->middleware('auth:sanctum');
 Route::get('chat_rooms',[ChatRoomController::class, 'index'])->middleware('auth:sanctum');
+Route::get('chat_classes',[ChatRoomController::class, 'indexForStudents'])->middleware('auth:sanctum');
 Route::get('messages/{id}', [MessageController::class, 'index'])->middleware('auth:sanctum');
 
 //list participants
