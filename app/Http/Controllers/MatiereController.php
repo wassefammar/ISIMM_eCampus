@@ -207,12 +207,14 @@ class MatiereController extends Controller
     {
         //
         
-        $matiere=Matiere::find($id);
+        $matiere=Matiere::where('id','=',$id)->first();
         
         if($matiere){
             $enseignantId=EnseignantMatiere::where('matiere_id','=',$id)->get();
             $classeId=MatiereClasse::where('matiere_id','=',$id)->get();
+            if(count($enseignantId)>0)
             $matiere->enseignants->detach($enseignantId->id);
+            if(count($classeId)>0)
             $matiere->classes->detach($classeId->id);
             $matiere->delete();
                 return response([

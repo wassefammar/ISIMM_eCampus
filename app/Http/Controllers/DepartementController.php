@@ -10,7 +10,7 @@ class DepartementController extends Controller
 {
     public function index(){
         $departements=Departement::with((['chefDepartement'=>function($query){
-                                          $query->select( 'nom', 'prenom');
+                                          $query->select( 'nom', 'prenom')->first();
                                         }]))
                                  ->withCount('enseignants')
                                  ->get();
@@ -47,12 +47,18 @@ class DepartementController extends Controller
                 if($departement){
                     $chefDep=Enseignant::where('id','=',$attrs['chefDepartement'])->first('id');
                     if($chefDep){
-                        
+                        $exist=Departement::where('nom','=',$attrs['nom'])->first();
+                        $exist->chefDepartement()->attach($chefDep->id);
+                        return response([
+                            'message'=>'departement créé avec succès'
+                        ],200);
                     }
-                    $exist=Departement::where('nom','=',$attrs['nom'])->first();
-                    return response([
-                        'message'=>'departement créé avec succès'
-                    ],200);
+                    else{
+                        return response([
+                            'message'=>'departement créé avec succès sans chef de departement'
+                        ],200);
+                    }
+
                 }
                 else{
                     return response([
@@ -65,7 +71,7 @@ class DepartementController extends Controller
                 ]);
                 if($departement){
                     return response([
-                        'message'=>'departement créé avec succès'
+                        'message'=>'departement créé avec succès sans chef de departement'
                     ],200);
                 }
                 else{
@@ -74,6 +80,65 @@ class DepartementController extends Controller
                     ],500); 
                 }  
             }
+        }
+    }
+
+
+    public function update(Request $request, $id){
+        $attrs=$request->validate([
+            'nom'=>'required|string',
+            'chefDepartement'=>'integer'
+        ]);
+        $departement=Departement::where('id','=',$id)->first();
+        if($departement){
+            if($request->has('chefDepartement')){
+                $departement->update([
+                    'nom'=>$attrs['nom']
+                ]);
+                 $chefDep=Enseignant::where('id','=',$attrs['chefDepartement'])->first('id');
+                 if($chefDep){
+                    $departement->chefDepartement()->attach($chefDep->id);
+                    return response([
+                        'message'=>'departement mise à jour avec succès'
+                    ],200);
+                    }
+                else{
+                    return response([
+                       'message'=>'departement mise à jour avec succès sans chef de departement'
+                    ],200);
+                }
+
+            }else{
+                $departement->update([
+                    'nom'=>$attrs['nom']
+                ]);
+                    return response([
+                        'message'=>'departement créé avec succès sans chef de departement'
+                    ],200);
+                
+
+            }
+
+        }
+        else{
+            return response([
+                'message'=>'departement non existant'
+            ],404);
+        
+        }
+    }
+
+    public function destroy($id){
+        $departement=Departement::where('id','=',$id)->first();
+        if($departement){
+            $departement->delete();
+            return response([
+                'message'=>'deparetment supprimé avec succès.'
+            ],200);
+        }else{
+            return response([
+                'message'=>'deparetment non existant.'
+            ],200);
         }
     }
 }
