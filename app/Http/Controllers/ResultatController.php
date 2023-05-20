@@ -13,7 +13,7 @@ use App\Models\EtudiantClasse;
 class ResultatController extends Controller
 {
     //
-    public function index(){
+    public function indexForStudents(){
         $etudiantId=auth('sanctum')->user()->id;
         $resultats=Resultat::where('student_id','=',$etudiantId)
                             ->with('matiere:id,nom')
@@ -29,6 +29,21 @@ class ResultatController extends Controller
                 'messaage'=>'Rien de résultats',
             ],404); 
         }                   
+    }
+
+    public function indexForAdmin(){
+        $resultats=Resultat::with('etudiant:id,nom,prenom,image')->get();
+        if(count($resultats)>0){
+            return response([
+                'messaage'=>'voila les résultats',
+                'resultats'=>$resultats
+            ],200);
+        }
+        else{
+            return response([
+                'messaage'=>'Rien de résultats',
+            ],404); 
+        }
     }
 
 

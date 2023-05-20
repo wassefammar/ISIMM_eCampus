@@ -299,6 +299,9 @@ Route::delete('supprimer_annonce/{id}',[AnnonceController::class, 'destroy'])->m
     Route::delete('supprimer_classe/{id}',[ClasseController::class, 'destroy']);
     Route::patch('modifier_classe/{id}',[ClasseController::class, 'update']);
 
+    //resultat
+    Route::get('list_resultats', [ResultatController::class, 'indexForAdmin']);
+
     Route::post('associer_enseignant_classe', [ClasseController::class, 'AssignClassToProf']);
     Route::post('associer_matiere_classe',[MatiereController::class,'AssignMatiereToClass']);
     Route::post('desassocier_enseignant_classe',[ClasseController::class,'desassocierEnseignantClasse']);
