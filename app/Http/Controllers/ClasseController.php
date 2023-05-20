@@ -303,15 +303,23 @@ class ClasseController extends Controller
             $attrs= $request->validate([
                 'nom'=>'required|string'
             ]);
+            if(Classe::where('nom','=',$attrs['nom'])->exists()){
+                return response([
+                    'message'=>'classe existe dèjà'
+                ],409);
+            }
+            else{
+                $classe->update([
+                    'nom'=>$attrs['nom']
+                ]);
+                
+                return response([
+                    'message'=>'Classe mise à jour',
+                    'classe'=> $classe
+                ],200);
+            }
 
-            $classe->update([
-                'nom'=>$attrs['nom']
-            ]);
-            
-            return response([
-                'message'=>'Classe mise à jour',
-                'classe'=> $classe
-            ],200);
+ 
         }
     }
 

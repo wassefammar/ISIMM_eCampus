@@ -58,6 +58,7 @@ Route::post('logout',[LoginController::class, 'logout'])->middleware('auth:sanct
 
 Route::get('matieres',[MatiereController::class, 'index'])->middleware('auth:sanctum');
 Route::post('ajouter_matiere',[MatiereController::class, 'store'])->middleware('auth:sanctum');
+//classe
 Route::post('ajouter_classe',[ClasseController::class, 'store'])->middleware('auth:sanctum');
 
 //liste Matiere()
@@ -292,6 +293,11 @@ Route::delete('supprimer_annonce/{id}',[AnnonceController::class, 'destroy'])->m
     Route::post('ajouter_departement', [DepartementController::class, 'store']);
     Route::delete('supprimer_departement/{id}', [DepartementController::class, 'destroy']);
     Route::patch('modifier_departement/{id}', [DepartementController::class, 'update']);
+
+    //classe
+    Route::post('ajouter_classe',[ClasseController::class, 'store']);
+    Route::delete('supprimer_classe/{id}',[ClasseController::class, 'destroy']);
+    Route::patch('modifier_classe/{id}',[ClasseController::class, 'update']);
 
     Route::post('associer_enseignant_classe', [ClasseController::class, 'AssignClassToProf']);
     Route::post('associer_matiere_classe',[MatiereController::class,'AssignMatiereToClass']);
