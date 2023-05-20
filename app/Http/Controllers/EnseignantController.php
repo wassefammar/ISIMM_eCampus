@@ -40,7 +40,6 @@ class EnseignantController extends Controller
                 'email'=>'required|email',
                 'telephone'=>'required|string|min:8',
             ]);
-            //$EnseignantIds=Enseignant::where('id','!=',auth('sanctum')->user()->id)->get(['id']);
             if(Enseignant::where('id','!=',$id)->where(['email'=>$attrs['email']])->exists()){
                 return response([
                     'message'=>'email déja existant'

@@ -15,7 +15,7 @@ class Departement extends Model
 
 
     public function enseignants(){
-        return $this->belongsToMany(Enseignant::class,'enseignant_id');
+        return $this->hasMany(Enseignant::class);
     }
 
     public function chefDepartement(){

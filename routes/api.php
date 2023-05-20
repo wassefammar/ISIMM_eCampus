@@ -279,8 +279,20 @@ Route::delete('supprimer_annonce/{id}',[AnnonceController::class, 'destroy'])->m
     Route::get('admin', [AdminController::class, 'user']);
     Route::post('update_admin', [AdminController::class, 'update']);
     Route::get('classes', [ClasseController::class, 'index']);
+    Route::post('ajouter_classes', [ClasseController::class, 'store']);
+    Route::delete('supprimer_classes', [ClasseController::class, 'destroy']);
+    Route::patch('modifier_classe/{id}', [ClasseController::class, 'store']);
+
     Route::get('matieres',[MatiereController::class, 'indexForAdmin']);
+    Route::post('ajouter_matiere',[MatiereController::class, 'store']);
+    Route::delete('supprimer_matiere/{id}',[MatiereController::class, 'destroy']);
+    Route::patch('modifier_matiere/{id}',[MatiereController::class, 'update']);
+
     Route::get('departements', [DepartementController::class, 'index']);
+    Route::post('ajouter_departement', [DepartementController::class, 'store']);
+    Route::delete('supprimer_departement/{id}', [DepartementController::class, 'destroy']);
+    Route::patch('modifier_departement/{id}', [DepartementController::class, 'update']);
+
     Route::post('associer_enseignant_classe', [ClasseController::class, 'AssignClassToProf']);
     Route::post('associer_matiere_classe',[MatiereController::class,'AssignMatiereToClass']);
     Route::post('desassocier_enseignant_classe',[ClasseController::class,'desassocierEnseignantClasse']);
