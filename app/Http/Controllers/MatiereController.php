@@ -172,7 +172,7 @@ class MatiereController extends Controller
         $matiere=Matiere::find($id);
         
         if($matiere){
-            if(Matiere::where('nom','=',$attrs['nom']->exists())){
+            if(Matiere::where('nom','=',$attrs['nom'])->exists()){
                 return response([
                     'message'=>'Matière déja existante.',
                 ],409);
