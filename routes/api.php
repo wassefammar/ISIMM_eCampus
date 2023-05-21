@@ -303,9 +303,10 @@ Route::delete('supprimer_annonce/{id}',[AnnonceController::class, 'destroy'])->m
     //resultat
     Route::get('list_resultats', [ResultatController::class, 'indexForAdmin']);
     Route::get('mes_resultats',[ResultatController::class, 'index']);
-    Route::post('confirmer_resultat',[ResultatController::class, 'storee']);
+    Route::post('confirmer_resultat',[ResultatController::class, 'store']);
     Route::delete('supprimer_resultat/{id}',[ResultatController::class, 'destroy']);
-
+    
+    //associiation enseignant classe matiere etudiant
     Route::post('associer_enseignant_classe', [ClasseController::class, 'AssignClassToProf']);
     Route::post('associer_matiere_classe',[MatiereController::class,'AssignMatiereToClass']);
     Route::post('desassocier_enseignant_classe',[ClasseController::class,'desassocierEnseignantClasse']);

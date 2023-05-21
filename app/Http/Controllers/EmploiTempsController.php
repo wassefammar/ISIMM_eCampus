@@ -203,50 +203,72 @@ class EmploiTempsController extends Controller
     public function store(Request $request){
         $attrs=$request->validate([
             'classe_id'=>'required|integer',
-          //  'seances'=>'array|required',
+            'seances'=>'array|required',
         ]);
-
-       // $seances=$attrs['seances'];
-       $s1=['matiere_id'=>1,'enseignant_id'=>1,'salle_id'=>1,'day'=>'Tuesday','start_time'=>'10:25:33', 'end_time'=>'10:53:00'];
-       $s2=['matiere_id'=>1,'enseignant_id'=>1,'salle_id'=>1,'day'=>'Monday','start_time'=>'10:25:33', 'end_time'=>'10:53:00'];
-       $seances=[$s1,$s2];
         $classeId=$attrs['classe_id'];
+        $seances=$attrs['seances'];
+
         $classe=Classe::find($classeId)->first();
         if($classe){
-            $emploi=EmploiTemps::create([
-                'classe_id'=>$classeId,
-                'nom'=>$classe->nom
-            ]);
-            if($emploi){
-                for($i=0;$i<count($seances);$i++){
-                    $seance=SessionMatiere::create([
-                        'matiere_id'=>$seances[$i]['matiere_id'],
-                        'enseignant_id'=>$seances[$i]["enseignant_id"],
-                        'salle_id'=>$seances[$i]['salle_id'],
-                        'day'=>$seances[$i]["day"],
-                        'startTime'=>$seances[$i]["start_time"],
-                        'endTime'=>$seances[$i]["end_time"]
-                    ]);
-                    if($seance){
-                        $emploi->seances()->attach($seance->id);
-                    }
-                    else{
-                        return response([
-                            'message'=>'erreur de matiere'
-                        ],500);
-
+            $exist=EmploiTemps::where('classe_id','=',$classe->id)->first();
+            if($exist){
+                foreach($seances as $seance){
+                    // Add curly braces to the string to make it a valid array representation
+                     $string = "[$seance];";
+                   // Evaluate the string as PHP code to convert it into an associative array
+                     eval("\$seance = $string");
+                    $session=SessionMatiere::create([
+                        'matiere_id'=>$seance['matiere_id'],
+                        'enseignant_id'=>$seance['enseignant_id'],
+                        'salle_id'=>$seance['salle_id'],
+                        'day'=>$seance['day'],
+                        'startTime'=>$seance['start_time'],
+                        'endTime'=>$seance['end_time']
+                       ]);
+                    if($session){
+                        $exist->seances()->attach($session->id);
                     }
                 }
 
                 return response([
-                    'message'=>'emploi créé avec succès'
+                    'message'=>'emploi mise à jour avec succès'
                 ],200);
+            }else{
+                $emploi=EmploiTemps::create([
+                    'classe_id'=>$classeId,
+                    'nom'=>$classe->nom
+                ]);
+                if($emploi){
+                    foreach($seances as $seance){
+                                    // Add curly braces to the string to make it a valid array representation
+                            $string = "[$seance];";
+                
+                            // Evaluate the string as PHP code to convert it into an associative array
+                            eval("\$seance = $string");
+                        $session=SessionMatiere::create([
+                            'matiere_id'=>$seance['matiere_id'],
+                            'enseignant_id'=>$seance['enseignant_id'],
+                            'salle_id'=>$seance['salle_id'],
+                            'day'=>$seance['day'],
+                            'startTime'=>$seance['start_time'],
+                            'endTime'=>$seance['end_time']
+                        ]);
+                        if($session){
+                            $emploi->seances()->attach($session->id);
+                        }
+                    }
+    
+                    return response([
+                        'message'=>'emploi créé avec succès'
+                    ],200);
+                }
+                else{
+                    return response([
+                        'message'=>'erreur de emploi'. $classeId
+                    ],500);
+                }
             }
-            else{
-                return response([
-                    'message'=>'erreur de emploi'. $classeId
-                ],500);
-            }
+
 
         }
         else{
@@ -255,7 +277,7 @@ class EmploiTempsController extends Controller
             ],404);
         }
     }
-
+    
     
 
     public function destroy($id){
