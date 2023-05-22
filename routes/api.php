@@ -321,7 +321,7 @@ Route::delete('supprimer_annonce/{id}',[AnnonceController::class, 'destroy'])->m
      
     //salles
     Route::get('salles',[SalleController::class, 'index']);
-    Route::post('ajouter_salle',[SalleController::class, 'index']);
+    Route::post('ajouter_salle',[SalleController::class, 'store']);
 
     //emploi
     Route::post('ajouter_emploi',[EmploiTempsController::class, 'store']);
