@@ -29,7 +29,7 @@ class DepartementController extends Controller
     }
 
     public function indexRegister(){
-        $departements=Departement::all(['id','nom']);
+        $departements=Departement::all('nom');
             if(count($departements)>0){
                     return response([
                     'departements'=>$departements
