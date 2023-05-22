@@ -32,7 +32,7 @@ class EpreuveController extends Controller
     } */
 
     public function indexForAdmin(){
-        $epreuves=Epreuve::with('classe:id,nom')->with('enseignant:id,nom,prenom')->with('salle:id,nom')->get();
+        $epreuves=Epreuve::with('classe:id,nom')->with('salle:id,nom')->get();
         if(count($epreuves)>0){
             return response([
                 'message'=>'voilà la liste de tous les examens',
@@ -59,11 +59,6 @@ class EpreuveController extends Controller
 
 
         $epreuves=Epreuve::whereIn('classe_id',$clss)
-                         ->with([
-                                'enseignant' => function ($query) {
-                                    $query->select('id','nom', 'prenom');
-                                }
-                            ])
                          ->with(['matiere' => function ($query) {
                                     $query->select('id','nom');
                                 }
@@ -88,67 +83,34 @@ class EpreuveController extends Controller
     }
 
     public function store(Request $request){
-       $attrs=$request->validate([
-        'classe_id'=>'required|integer',
-        'matiere_id'=>'required|integer',
-        'enseignant_id'=>'required|integer',
-        'salle_id'=>'required|integer',
-        'date'=>'required|date_format:Y-m-d',
-        'startTime'=>'required|date_format:H:i:s',
-        'endTime'=>'required|date_format:H:i:s'
+        $attrs=$request->validate([
+            'classe_id'=>'required|integer',
+            'epreuves'=>'required|array',
+        ]);
+        $classeId=$attrs['classe_id'];
+        $epreuves=$attrs['epreuves'];
+        foreach($epreuves as $epreuve){
+                        // Add curly braces to the string to make it a valid array representation
+            $string = "[$epreuve];";
 
-       ]);
-       $enseignantId=$attrs['enseignant_id'];
-
-       $matiereId=$attrs['matiere_id'];
-       $classeId=$attrs['classe_id'];
-
-       $emc = EnseignantMatiere::where('enseignant_id', '=', $enseignantId)
-               ->where('matiere_id', '=', $matiereId)
-               ->whereExists(function ($query) use ($enseignantId, $classeId) {
-                   $query->select(DB::raw(1))
-                       ->from('enseignant_classes')
-                       ->whereRaw('enseignant_classes.enseignant_id = enseignant_matieres.enseignant_id')
-                       ->where('enseignant_classes.classe_id', '=', $classeId);
-               })
-               ->whereExists(function ($query) use ($matiereId, $classeId) {
-                   $query->select(DB::raw(1))
-                       ->from('matiere_classes')
-                       ->whereRaw('matiere_classes.matiere_id = enseignant_matieres.matiere_id')
-                       ->where('matiere_classes.classe_id', '=', $classeId);
-               })
-               ->get();
-
-        if(count($emc)>0){
-            $epreuve=Epreuve::create([
-                'classe_id'=>$classeId,
-                'matiere_id'=>$matiereId,
-                'enseignant_id'=>$enseignantId,
-                'salle_id'=>$attrs['salle_id'],
-                'date'=>$attrs['date'],
-                'startTime'=>$attrs['startTime'],
-                'endTime'=>$attrs['endTime']
+            // Evaluate the string as PHP code to convert it into an associative array
+            eval("\$epreuve = $string");
+            $exist=Epreuve::create([
+               'matiere_id'=>$epreuve['matiere_id'],
+               'classe_id'=>$classeId,
+               'salle_id'=>$epreuve['salle_id'],              
+               'date'=>$epreuve['date'],
+               'startTime'=>$epreuve['startTime'],
+               'endTime'=>$epreuve['endTime']
             ]);
-            if($epreuve){
-                $epreuve->matiere()->associate($matiereId);
-                $epreuve->enseignant()->associate($enseignantId);
-                $epreuve->classe()->associate($classeId);
-                $epreuve->salle()->associate($attrs['salle_id']);
-
-                return response([
-                    'message'=>'epreuve créé avec succès'
-                ],200);
-            }
-            else{
-                return response([
-                    'message'=>'Oops... problème de serveur'
-                ],500); 
-            }
-        } else{
-            return response([
-                'message'=>'Enseignant non assigné'
-            ],422); 
-        }      
+            $exist->classe()->associate($classeId);
+            $exist->salle()->associate($epreuve['salle_id']);
+            $exist->matiere()->associate($epreuve['matiere_id']);           
+        }
+        return response([
+             'message'=>'tout les resulatats sont ajoutés'
+        ],200);
+        
     }
 
     public function update(Request $request, $id){

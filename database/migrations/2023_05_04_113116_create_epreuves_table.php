@@ -16,7 +16,6 @@ return new class extends Migration
         Schema::create('epreuves', function (Blueprint $table) {
             $table->id();
             $table->foreignId('matiere_id')->constrained('matieres')->cascadeOnDelete();
-            $table->foreignId('enseignant_id')->constrained('enseignants')->cascadeOnDelete();
             $table->foreignId('classe_id')->constrained('classes')->cascadeOnDelete();
             $table->foreignId('salle_id')->constrained('salles')->cascadeOnDelete();
             $table->date('date');

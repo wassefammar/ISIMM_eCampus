@@ -13,7 +13,6 @@ class Epreuve extends Model
     protected $fillable=[
         'classe_id',
         'matiere_id',
-        'enseignant_id',
         'salle_id',
         'date',
         'startTime',
@@ -28,9 +27,6 @@ class Epreuve extends Model
         return $this->belongsTo(Classe::class, 'classe_id');
     }
 
-    public function enseignant(){
-        return $this->belongsTo(Enseignant::class, 'enseignant_id');
-    }
 
     public function salle(){
         return $this->belongsTo(Salle::class, 'salle_id');
