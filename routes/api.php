@@ -47,6 +47,7 @@ use App\Http\Controllers\EnseignantChatAdminController;
 }); */
 
 Route::post('register_enseignant',[EnseignantController::class, 'register']);
+Route::get('list_departements',[DepartementController::class, 'indexRegister']);
 Route::post('register_etudiant',[StudentController::class, 'register']);
 Route::post('register_admin',[AdminController::class, 'register']);
 Route::post('login',[LoginController::class, 'login']);

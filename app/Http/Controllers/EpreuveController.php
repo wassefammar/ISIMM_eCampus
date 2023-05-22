@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\DB;
 class EpreuveController extends Controller
 {
     //
-    public function indexForAdmin(){
+/*     public function indexForAdmin(){
         $enseignants=Enseignant::all(['id','nom','prenom']);
         $classes=Classe::all(['id','nom']);
         $matieres=Matiere::all(['id','nom']);
@@ -29,6 +29,21 @@ class EpreuveController extends Controller
             'salles'=>$salles
         ],200);
       
+    } */
+
+    public function indexForAdmin(){
+        $epreuves=Epreuve::with('classe:id,nom')->with('enseignant:id,nom,prenom')->with('salle:id,nom')->get();
+        if(count($epreuves)>0){
+            return response([
+                'message'=>'voilà la liste de tous les examens',
+                'epreuves'=>$epreuves
+            ]);
+        }
+        else{
+            return response([
+                'message'=>"Pas d'examens pour le moment",
+            ]); 
+        }
     }
 
     public function indexForStudents(){

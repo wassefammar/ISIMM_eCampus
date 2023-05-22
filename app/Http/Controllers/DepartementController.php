@@ -28,6 +28,20 @@ class DepartementController extends Controller
         
     }
 
+    public function indexRegister(){
+        $departements=Departement::all(['id','nom']);
+            if(count($departements)>0){
+                    return response([
+                    'departements'=>$departements
+                    ],200);
+            }
+            else{
+                    return response([
+                    'message'=>'pas de departements',
+                    ],404);
+            }   
+    }
+
     public function store(Request $request){
         $attrs=$request->validate([
             'nom'=>'required|string',
