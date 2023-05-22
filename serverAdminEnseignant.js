@@ -16,42 +16,43 @@ const connection = mysql.createConnection({
   database: 'isimm'
 });
 
-// channel
 const channelName = "anonymous_group";
-let messages = []; // les messages seront stockés ici
+let messages = [];
 
-access_token="10|JQG2mPMzvDywkqYHoNFeUEoeYNfdqYqKsl4xGVYs";
-
-// Écoute de l'événement 'connection' de Socket.io
 io.on('connection', (socket) => {
   socket.join(channelName);
+
   console.log('Backend Connected');
   console.log(socket.id);
-  console.log(`Un utilisateur s'est connecté avec l'ID ${socket.id}`);
+  console.log('A user has connected with ID ${socket.id}');
 
-    // envoi des messages existants lorsqu'un nouvel utilisateur se connecte
-    socket.emit("loadMessages", messages);
 
-  // Écoute de l'événement 'message' de Socket.io
-  socket.on('message', (message) => {
-    console.log('Nouveau message : ' + message.content+' '+message.sender);
+  socket.on('sendMsg', (message) => {
+    console.log('New message: ' + message.msg + ' ' + message.sender);
     // Insertion du message dans la table de la base de données
     axios({
       method: 'post',
       url: 'ISIMM_eCampus/public/api/repondre_enseignant',
       headers: {
-        'Authorization': 'Bearer '+ access_token
+        'Authorization': 'Bearer '+ message.access_token
       },
       data:{
-        "text":message.content,
-        "chat_id":1
+        "text":message.msg,
+        "chat_id":message.chat_id,
       }
     });  
 
-    messages.push(msg);
-    io.to(channelName).emit('SendMsgServer', {...msg, type: "otherMsg"}); // utilisez le même type que celui du message reçu
+ 
+   
+    io.to("anonymous_group").emit('sendMsgServer', { ...message, type: "otherMsg" });
   });
+
+  // Ajoutez votre code ici pour exécuter les actions nécessaires lors de la connexion du backend
+
 });
 
-// Démarrage du serveur Socket.io
-io.listen(3000); 
+http.listen(3000, () => {
+  console.log('Socket.io server listening on port 10000');
+})
+
+

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DepartementController;
+use App\Http\Controllers\SalleController;
 use App\Models\StudentChatAdmin;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LikeController;
@@ -54,6 +55,10 @@ Route::post('login',[LoginController::class, 'login']);
 Route::post('logout',[LoginController::class, 'logout'])->middleware('auth:sanctum');
 
 //Route::get('students',[StudentController::class, 'fiit']);
+
+//salles
+
+Route::get('salles',[SalleController::class, 'index']);
 
 //les matieres
 
@@ -313,13 +318,17 @@ Route::delete('supprimer_annonce/{id}',[AnnonceController::class, 'destroy'])->m
     Route::post('desassocier_enseignant_classe',[ClasseController::class,'desassocierEnseignantClasse']);
     Route::post('associer_etudiant_classe',[ClasseController::class,'AssignStudentToClass']);
     Route::post('desassocier_etudiant_classe',[ClasseController::class,'desassocierEtudiantClasse']);
+     
+    //salles
+    Route::get('salles',[SalleController::class, 'index']);
+    Route::post('ajouter_salle',[SalleController::class, 'index']);
 
     //emploi
     Route::post('ajouter_emploi',[EmploiTempsController::class, 'store']);
     Route::delete('supprimer_emploi/{id}', [EmploiTempsController::class, 'destroy']);
 
     //admin
-    Route::post('admin/ajouter_annonce',[AnnonceController::class, 'storeForAdmins'])->middleware('auth:sanctum');
+    Route::post('admin/ajouter_annonce',[AnnonceController::class, 'storeForAdmins']);
 
  
  }); 

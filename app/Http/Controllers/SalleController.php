@@ -9,7 +9,7 @@ class SalleController extends Controller
 {
     //
     public function index(){
-       $salles=Salle::all(['nom']);
+       $salles=Salle::all(['id','nom']);
        if(count($salles)>0){
         return response([
             'message'=>'voilà les salles',
