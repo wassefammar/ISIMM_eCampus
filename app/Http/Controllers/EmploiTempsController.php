@@ -2,13 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Salle;
 use App\Models\Classe;
-use App\Models\EtudiantClasse;
+use App\Models\Matiere;
 use App\Models\Student;
+use App\Models\Enseignant;
 use App\Models\EmploiTemps;
 use App\Models\EmploiSeance;
 use Illuminate\Http\Request;
+use App\Models\MatiereClasse;
+use App\Models\EtudiantClasse;
 use App\Models\SessionMatiere;
+use App\Models\EnseignantMatiere;
+use Illuminate\Support\Facades\DB;
 
 class EmploiTempsController extends Controller
 {
@@ -206,28 +212,76 @@ class EmploiTempsController extends Controller
             'seances'=>'array|required',
         ]);
         $classeId=$attrs['classe_id'];
-        $seances=$attrs['seances'];
-
+        //$seances=$attrs['seances'];
+        $s1='matiere_id'.'=>'.'Algebre'.' 2'.','.'enseignant_id'.'=>'.'1'.','.'salle_id'.'=>'.'A22'.','.'day'.'=>'.'lundi'.','.'start_time'.'=>'.'8'.':'.'30'.':'.'22'.','.'end_time'.'=>'.'10'.':'.'20'.':'.'00';
+        $s2='matiere_id'.'=>'.'Algebre'.' 2'.','.'enseignant_id'.'=>'.'1'.','.'salle_id'.'=>'.'A22'.','.'day'.'=>'.'lundi'.','.'start_time'.'=>'.'8'.':'.'40'.':'.'22'.','.'end_time'.'=>'.'10'.':'.'30'.':'.'00';
+        $s3=$s1.';'.$s2;
+        $seances=array();
+        array_push($seances,$s3);
         $classe=Classe::find($classeId)->first();
         if($classe){
             $exist=EmploiTemps::where('classe_id','=',$classe->id)->first();
             if($exist){
                 foreach($seances as $seance){
-                    // Add curly braces to the string to make it a valid array representation
-                     $string = "[$seance];";
-                   // Evaluate the string as PHP code to convert it into an associative array
-                     eval("\$seance = $string");
-                    $session=SessionMatiere::create([
-                        'matiere_id'=>$seance['matiere_id'],
-                        'enseignant_id'=>$seance['enseignant_id'],
-                        'salle_id'=>$seance['salle_id'],
-                        'day'=>$seance['day'],
-                        'startTime'=>$seance['start_time'],
-                        'endTime'=>$seance['end_time']
-                       ]);
-                    if($session){
-                        $exist->seances()->attach($session->id);
-                    }
+                    $i=0;
+                    $seanc=explode(';',$seance);
+                    foreach($seanc as $se){
+                        $pairs = explode(",", $se);
+
+                        // Initialize an empty array
+                        $array = array();
+
+                        // Iterate through the pairs and create the associative array
+                        foreach ($pairs as $pair) {
+                            list($key, $value) = explode("=>", $pair);
+                            $array[($key)] = ($value);
+                        }
+
+                        $enseignantId=intval($array['enseignant_id']);
+                        $salleId=Salle::where('nom','=',$array['salle_id'])->first();
+                        $matiere=Matiere::where('nom','=',$array['matiere_id'])->first();
+                        $matiereId=$matiere->id;
+                        $emc = EnseignantMatiere::where('enseignant_id', '=', $enseignantId)
+                                                ->where('matiere_id', '=', $matiereId)
+                                                ->whereExists(function ($query) use ($enseignantId, $classeId) {
+                                                    $query->select(DB::raw(1))
+                                                        ->from('enseignant_classes')
+                                                        ->whereRaw('enseignant_classes.enseignant_id = enseignant_matieres.enseignant_id')
+                                                        ->where('enseignant_classes.classe_id', '=', $classeId);
+                                                })
+                                                ->whereExists(function ($query) use ($matiereId, $classeId) {
+                                                    $query->select(DB::raw(1))
+                                                        ->from('matiere_classes')
+                                                        ->whereRaw('matiere_classes.matiere_id = enseignant_matieres.matiere_id')
+                                                        ->where('matiere_classes.classe_id', '=', $classeId);
+                                                })
+                                                ->get(); 
+                        if(count($emc)>0){
+                            $session=SessionMatiere::create([
+                                'matiere_id'=>$matiereId,
+                                'enseignant_id'=>$enseignantId,
+                                'salle_id'=>$salleId->id,
+                                'day'=>$array['day'],
+                                'startTime'=>$array['start_time'],
+                                'endTime'=>$array['end_time']
+                            ]);
+                            if($session){
+                                $exist->seances()->attach($session->id);
+                            }
+                        }else{
+                            $i++;
+                            continue;
+                        }                        
+
+                    } 
+                      
+
+                }
+                if($i!=0){
+                    //
+                    return response([
+                        'message'=>"peut etre que l'emploi manque des sèances soyez sur que les enseignants correspendent à cette classe et les matieres correspendent  aux enseignants et à la classe",
+                    ],200);
                 }
 
                 return response([
@@ -240,22 +294,62 @@ class EmploiTempsController extends Controller
                 ]);
                 if($emploi){
                     foreach($seances as $seance){
-                                    // Add curly braces to the string to make it a valid array representation
-                            $string = "[$seance];";
-                
-                            // Evaluate the string as PHP code to convert it into an associative array
-                            eval("\$seance = $string");
-                        $session=SessionMatiere::create([
-                            'matiere_id'=>$seance['matiere_id'],
-                            'enseignant_id'=>$seance['enseignant_id'],
-                            'salle_id'=>$seance['salle_id'],
-                            'day'=>$seance['day'],
-                            'startTime'=>$seance['start_time'],
-                            'endTime'=>$seance['end_time']
-                        ]);
-                        if($session){
-                            $emploi->seances()->attach($session->id);
-                        }
+                        $j=0;
+                        $seanc=explode(';',$seance);
+                        foreach($seanc as $se){
+                            $pairs = explode(",", $se);
+    
+                            // Initialize an empty array
+                            $array = array();
+    
+                            // Iterate through the pairs and create the associative array
+                            foreach ($pairs as $pair) {
+                                list($key, $value) = explode("=>", $pair);
+                                $array[($key)] = ($value);
+                            }
+    
+                            $enseignantId=intval($array['enseignant_id']);
+                            $salleId=Salle::where('nom','=',$array['salle_id'])->first();
+                            $matiere=Matiere::where('nom','=',$array['matiere_id'])->first();
+                            $matiereId=$matiere->id;
+                            $emc = EnseignantMatiere::where('enseignant_id', '=', $enseignantId)
+                                                    ->where('matiere_id', '=', $matiereId)
+                                                    ->whereExists(function ($query) use ($enseignantId, $classeId) {
+                                                        $query->select(DB::raw(1))
+                                                            ->from('enseignant_classes')
+                                                            ->whereRaw('enseignant_classes.enseignant_id = enseignant_matieres.enseignant_id')
+                                                            ->where('enseignant_classes.classe_id', '=', $classeId);
+                                                    })
+                                                    ->whereExists(function ($query) use ($matiereId, $classeId) {
+                                                        $query->select(DB::raw(1))
+                                                            ->from('matiere_classes')
+                                                            ->whereRaw('matiere_classes.matiere_id = enseignant_matieres.matiere_id')
+                                                            ->where('matiere_classes.classe_id', '=', $classeId);
+                                                    })
+                                                    ->get(); 
+                            if(count($emc)>0){
+                                $session=SessionMatiere::create([
+                                    'matiere_id'=>$matiereId,
+                                    'enseignant_id'=>$enseignantId,
+                                    'salle_id'=>$salleId->id,
+                                    'day'=>$array['day'],
+                                    'startTime'=>$array['start_time'],
+                                    'endTime'=>$array['end_time']
+                                ]);
+                                if($session){
+                                    $emploi->seances()->attach($session->id);
+                                }
+                            }else{
+                                $i++;
+                                continue;
+                            }                        
+    
+                        } 
+                    }
+                    if($j!=0){
+                        return response([
+                            'message'=>"peut etre que l'emploi mise à jour avec succès"
+                        ],200);
                     }
     
                     return response([

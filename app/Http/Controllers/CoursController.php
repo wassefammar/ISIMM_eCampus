@@ -174,16 +174,7 @@ class CoursController extends Controller
 
    }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Cours  $cours
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Cours $cours)
-    {
-        //
-    }
+
 
 
     /**
