@@ -7,6 +7,7 @@ use App\Models\Enseignant;
 use App\Models\Epreuve;
 use App\Models\EtudiantClasse;
 use App\Models\Matiere;
+use App\Models\MatiereClasse;
 use App\Models\Salle;
 use App\Models\Student;
 use Illuminate\Http\Request;
@@ -95,8 +96,11 @@ class EpreuveController extends Controller
 
             // Evaluate the string as PHP code to convert it into an associative array
             eval("\$epreuve = $string");
+            $matiereId=Matiere::where('nom','=',$epreuve['matiere_id'])->first();
+            $vrai=MatiereClasse::where('matiere_id','=',$matiereId->id)->where('classe_id','=',$classeId)->first();
+            if($vrai){
             $exist=Epreuve::create([
-               'matiere_id'=>$epreuve['matiere_id'],
+               'matiere_id'=>$matiereId->id,
                'classe_id'=>$classeId,
                'salle_id'=>$epreuve['salle_id'],              
                'date'=>$epreuve['date'],
@@ -105,7 +109,12 @@ class EpreuveController extends Controller
             ]);
             $exist->classe()->associate($classeId);
             $exist->salle()->associate($epreuve['salle_id']);
-            $exist->matiere()->associate($epreuve['matiere_id']);           
+            $exist->matiere()->associate($epreuve['matiere_id']);   
+            }
+            else{
+                continue;
+            }
+        
         }
         return response([
              'message'=>'tout les resulatats sont ajoutés'
