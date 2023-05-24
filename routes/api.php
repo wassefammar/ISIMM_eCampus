@@ -213,7 +213,6 @@ Route::get('emploi_temps',[EmploiTempsController::class, 'indexForStudents'])->m
 Route::get('emploi_classe',[EmploiTempsController::class, 'indexForAdmins'])->middleware('auth:sanctum');
 
 //annonces
-Route::delete('supprimer_annonce/{id}',[AnnonceController::class, 'destroy'])->middleware('auth:sanctum');
 
 
 /****Groupe des apis liées aux etudiants */

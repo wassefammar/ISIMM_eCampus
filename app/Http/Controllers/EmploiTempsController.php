@@ -209,24 +209,27 @@ class EmploiTempsController extends Controller
     public function store(Request $request){
         $attrs=$request->validate([
             'classe_id'=>'required|integer',
-            'seances'=>'array|required',
+            'jours'=>'array|required',
         ]);
         $classeId=$attrs['classe_id'];
-        //$seances=$attrs['seances'];
-        $s1='matiere_id'.'=>'.'Algebre'.' 2'.','.'enseignant_id'.'=>'.'1'.','.'salle_id'.'=>'.'A22'.','.'day'.'=>'.'lundi'.','.'start_time'.'=>'.'8'.':'.'30'.':'.'22'.','.'end_time'.'=>'.'10'.':'.'20'.':'.'00';
+        $jours=$attrs['jours'];
+/*          $s1='matiere_id'.'=>'.'Algebre'.' 2'.','.'enseignant_id'.'=>'.'1'.','.'salle_id'.'=>'.'A22'.','.'day'.'=>'.'lundi'.','.'start_time'.'=>'.'8'.':'.'30'.':'.'22'.','.'end_time'.'=>'.'10'.':'.'20'.':'.'00';
         $s2='matiere_id'.'=>'.'Algebre'.' 2'.','.'enseignant_id'.'=>'.'1'.','.'salle_id'.'=>'.'A22'.','.'day'.'=>'.'lundi'.','.'start_time'.'=>'.'8'.':'.'40'.':'.'22'.','.'end_time'.'=>'.'10'.':'.'30'.':'.'00';
         $s3=$s1.';'.$s2;
+        $jours=array();
         $seances=array();
-        array_push($seances,$s3);
+        array_push($jours,$s3); */ 
+        //$jours=array();
+        //$jours[0]='matiere_id'=>'Algebre 2','enseignant_id'=>1,'salle_id'=>'A22','day'=>'lundi','start_time'=>'8:30:22','end_time'=>'10:20:00';'matiere_id'=>'Algebre 2','enseignant_id'=>1,'salle_id'=>'A22','day'=>'lundi','start_time'=>'8:30:22','end_time'=>'10:20:00';'matiere_id'=>'Algebre 2','enseignant_id'=>1,'salle_id'=>'A22','day'=>'lundi','start_time'=>'8:30:22','end_time'=>'10:20:00'";
         $classe=Classe::find($classeId)->first();
         if($classe){
             $exist=EmploiTemps::where('classe_id','=',$classe->id)->first();
             if($exist){
-                foreach($seances as $seance){
+                foreach($jours as $jour){
                     $i=0;
-                    $seanc=explode(';',$seance);
-                    foreach($seanc as $se){
-                        $pairs = explode(",", $se);
+                    $seances=explode(';',$jour);
+                    foreach($seances as $seance){
+                        $pairs = explode(",", $seance);
 
                         // Initialize an empty array
                         $array = array();
@@ -236,10 +239,13 @@ class EmploiTempsController extends Controller
                             list($key, $value) = explode("=>", $pair);
                             $array[($key)] = ($value);
                         }
-
+                        print_r($array);
+                        print(strval($array['matiere_id']) );
+                        print($array['enseignant_id']);
+                        print($array['salle_id']);
                         $enseignantId=intval($array['enseignant_id']);
                         $salleId=Salle::where('nom','=',$array['salle_id'])->first();
-                        $matiere=Matiere::where('nom','=',$array['matiere_id'])->first();
+                        $matiere=Matiere::where('nom','=',strval($array['matiere_id']))->first();
                         $matiereId=$matiere->id;
                         $emc = EnseignantMatiere::where('enseignant_id', '=', $enseignantId)
                                                 ->where('matiere_id', '=', $matiereId)
@@ -293,11 +299,11 @@ class EmploiTempsController extends Controller
                     'nom'=>$classe->nom
                 ]);
                 if($emploi){
-                    foreach($seances as $seance){
+                    foreach($jours as $jour){
                         $j=0;
-                        $seanc=explode(';',$seance);
-                        foreach($seanc as $se){
-                            $pairs = explode(",", $se);
+                        $seances=explode(';',$jour);
+                        foreach($seances as $seance){
+                            $pairs = explode(",", $seance);
     
                             // Initialize an empty array
                             $array = array();

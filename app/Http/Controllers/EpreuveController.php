@@ -83,59 +83,52 @@ class EpreuveController extends Controller
 
     }
 
-    public function store(Request $request){
-        $attrs=$request->validate([
-            'classe_id'=>'required|integer',
-            'epreuves'=>'required|array',
+    public function store(Request $request) {
+        $attrs = $request->validate([
+            'classe_id' => 'required|integer',
+            'epreuves' => 'required|array',
         ]);
-        $classeId=$attrs['classe_id'];
-        $epreuves=$attrs['epreuves'];
-        foreach($epreuves as $epreuve){
-            $i=0;
-            $j=0;
-                        // Add curly braces to the string to make it a valid array representation
-            $string = "[$epreuve];";
-
-            // Evaluate the string as PHP code to convert it into an associative array
-            eval("\$epreuve = $string");
-            $salleId=Salle::where('nom','=',$epreuve['salle_id'])->first();
-            $matiereId=Matiere::where('nom','=',$epreuve['matiere_id'])->first();
-            $vrai=MatiereClasse::where('matiere_id','=',$matiereId->id)->where('classe_id','=',$classeId)->first();
-            if($vrai){
-                if($salleId){
-                    $exist=Epreuve::create([
-                        'matiere_id'=>$matiereId->id,
-                        'classe_id'=>$classeId,
-                        'salle_id'=>$salleId->id,              
-                        'date'=>$epreuve['date'],
-                        'startTime'=>$epreuve['startTime'],
-                        'endTime'=>$epreuve['endTime']
-                     ]);
-                     $exist->classe()->associate($classeId);
-                     $exist->salle()->associate($epreuve['salle_id']);
-                     $exist->matiere()->associate($epreuve['matiere_id']); 
+        $classeId = $attrs['classe_id'];
+        $epreuves = $attrs['epreuves'];
+        $errors = [];
+    
+        foreach ($epreuves as $epreuve) {
+            $salleId = Salle::where('nom', '=', $epreuve['salle_id'])->first();
+            $matiereId = Matiere::where('nom', '=', $epreuve['matiere_id'])->first();
+            $vrai = MatiereClasse::where('matiere_id', '=', $matiereId->id)->where('classe_id', '=', $classeId)->first();
+    
+            if ($vrai) {
+                if ($salleId) {
+                    $exist = Epreuve::create([
+                        'matiere_id' => $matiereId->id,
+                        'classe_id' => $classeId,
+                        'salle_id' => $salleId->id,
+                        'date' => $epreuve['date'],
+                        'startTime' => $epreuve['startTime'],
+                        'endTime' => $epreuve['endTime']
+                    ]);
+    
+                    $exist->classe()->associate($classeId);
+                    $exist->salle()->associate($salleId);
+                    $exist->matiere()->associate($matiereId);
+                } else {
+                    $errors[] = "La salle '{$epreuve['salle_id']}' n'existe pas.";
                 }
-                else{
-                    $i++;
-                   continue;
-                }
-  
+            } else {
+                $errors[] = "La matière '{$epreuve['matiere_id']}' n'existe pas pour la classe spécifiée.";
             }
-            else{
-                $j++;
-                continue;
-            }
-        
         }
-        if($i!=0 || $j!=0){
+    
+        if (!empty($errors)) {
             return response([
-                'message'=>'Peut etre que certaines épreuves ne sont pas ajoutés à cause de faute de salle ou matiere'
-           ],200);
+                'message' => 'Certaines épreuves n\'ont pas été ajoutées en raison d\'erreurs.',
+                'errors' => $errors
+            ], 200);
         }
+    
         return response([
-             'message'=>'tout les épreuves sont ajoutés'
-        ],200);
-        
+            'message' => 'Toutes les épreuves ont été ajoutées avec succès.'
+        ], 200);
     }
 
     public function update(Request $request, $id){

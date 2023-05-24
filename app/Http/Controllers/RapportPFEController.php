@@ -13,7 +13,7 @@ class RapportPFEController extends Controller
 
 
     public function index(){
-        $rapports=RapportPFE::all()->sortDesc();
+        $rapports=RapportPFE::all();
         if(count($rapports)>0){
             return response([
                 'message'=>'voilà les rapports',

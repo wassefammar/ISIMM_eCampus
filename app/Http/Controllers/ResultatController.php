@@ -49,61 +49,66 @@ class ResultatController extends Controller
 
 
 
-    public function store(Request $request){
-        $attrs=$request->validate([
-            'matiere_id'=>'required|integer',
-            'resultats'=>'required|array',
+    public function store(Request $request)
+    {
+        $attrs = $request->validate([
+            'matiere_id' => 'required|integer',
+            'resultats' => 'required|array',
         ]);
-        $matiereId=$attrs['matiere_id'];
-        $resultats=$attrs['resultats'];
-        foreach($resultats as $resultat){
-                        // Add curly braces to the string to make it a valid array representation
-            $string = "[$resultat];";
-
-            // Evaluate the string as PHP code to convert it into an associative array
-            eval("\$resultat = $string");
-            $etudiantId=$resultat['etudiant_id'];
-
-            $exist=Resultat::where('matiere_id','=',$matiereId)->where('student_id','=',$etudiantId)->first();
-          if($exist){
-            $exist->update([
-                'note_TD'=>$resultat['note_TD'],
-                'note_TP'=>$resultat['note_TP'],
-                'note_DS'=>$resultat['note_DS'],
-                'note_Examen'=>$resultat['note_Examen'],
-                'moyenne'=>$resultat['moyenne'],
-                'credit'=>$resultat['credit']
-            ]);
-
-          }
-          else{
-            $etudiant=Student::find($etudiantId);
-            if($etudiant){
-                $classes=EtudiantClasse::where('student_id','=',$etudiantId)->get('classe_id');  
-                $matiere=MatiereClasse::whereIn('classe_id',$classes)->where('matiere_id','=',$matiereId)->first();
-                if($matiere){
-                    Resultat::create([
-                        'matiere_id'=>$matiereId,
-                        'student_id'=>$etudiantId,
-                        'note_TD'=>$resultat['note_TD'],
-                        'note_TP'=>$resultat['note_TP'],
-                        'note_DS'=>$resultat['note_DS'],
-                        'note_Examen'=>$resultat['note_Examen'],
-                        'moyenne'=>$resultat['moyenne'],
-                        'credit'=>$resultat['credit']
-                    ]);
+    
+        $matiereId = $attrs['matiere_id'];
+        $resultats = $attrs['resultats'];
+    
+        foreach ($resultats as $resultat) {
+            // Convert the array to a JSON string
+            $string = json_encode($resultat);
+    
+            // Convert the JSON string back to an associative array
+            $resultat = json_decode($string, true);
+    
+            $etudiantId = $resultat['etudiant_id'];
+    
+            $exist = Resultat::where('matiere_id', '=', $matiereId)
+                            ->where('student_id', '=', $etudiantId)
+                            ->first();
+    
+            if ($exist) {
+                $exist->update([
+                    'note_TD' => $resultat['note_TD'],
+                    'note_TP' => $resultat['note_TP'],
+                    'note_DS' => $resultat['note_DS'],
+                    'note_Examen' => $resultat['note_Examen'],
+                    'moyenne' => $resultat['moyenne'],
+                    'credit' => $resultat['credit']
+                ]);
+            } else {
+                $etudiant = Student::find($etudiantId);
+    
+                if ($etudiant) {
+                    $classes = EtudiantClasse::where('student_id', '=', $etudiantId)->get('classe_id');
+                    $matiere = MatiereClasse::whereIn('classe_id', $classes)->where('matiere_id', '=', $matiereId)->first();
+    
+                    if ($matiere) {
+                        Resultat::create([
+                            'matiere_id' => $matiereId,
+                            'student_id' => $etudiantId,
+                            'note_TD' => $resultat['note_TD'],
+                            'note_TP' => $resultat['note_TP'],
+                            'note_DS' => $resultat['note_DS'],
+                            'note_Examen' => $resultat['note_Examen'],
+                            'moyenne' => $resultat['moyenne'],
+                            'credit' => $resultat['credit']
+                        ]);
+                    } else {
+                        continue;
+                    }
                 }
-                else{
-                    continue;
-                }
-
             }
         }
+    
         return response([
-             'message'=>'tout les resulatats sont ajoutés'
-        ],200);
-        
-     }
+            'message' => 'Tous les résultats ont été ajoutés.'
+        ], 200);
     }
 
 
