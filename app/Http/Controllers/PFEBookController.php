@@ -12,7 +12,7 @@ class PFEBookController extends Controller
 {
     //
     public function indexAjout(){
-        $societes=Societe::all('nom')->sortDesc();
+        $societes=Societe::all('nom');
         if($societes){
             return response([
                 'message'=>'Voilà les societes',

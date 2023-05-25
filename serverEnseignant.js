@@ -13,45 +13,44 @@ const connection = mysql.createConnection({
   host: 'localhost',
   user: 'root',
   password: '',
-  database: 'isimm'
+  database: 'hammadi'
 });
 
 // channel
 const channelName = "anonymous_group";
 let messages = []; // les messages seront stockés ici
 
-access_token="10|JQG2mPMzvDywkqYHoNFeUEoeYNfdqYqKsl4xGVYs";
 
 // Écoute de l'événement 'connection' de Socket.io
 io.on('connection', (socket) => {
-  socket.join(channelName);
-  console.log('Backend Connected');
-  console.log(socket.id);
-  console.log(`Un utilisateur s'est connecté avec l'ID ${socket.id}`);
+      socket.join(channelName);
+      console.log('Backend Connected');
+      console.log(socket.id);
+      console.log('Un utilisateur sest connecté avec lID ${socket.id}');
 
-    // envoi des messages existants lorsqu'un nouvel utilisateur se connecte
-    socket.emit("loadMessages", messages);
+        // envoi des messages existants lorsqu'un nouvel utilisateur se connecte
+        socket.emit("loadMessages", messages);
 
-  // Écoute de l'événement 'message' de Socket.io
-  socket.on('message', (message) => {
-    console.log('Nouveau message : ' + message.content+' '+message.sender);
-    // Insertion du message dans la table de la base de données
-    axios({
-      method: 'post',
-      url: 'ISIMM_eCampus/public/api/enseignant/contacter_admin',
-      headers: {
-        'Authorization': 'Bearer '+ access_token
-      },
-      data:{
-        "text":message.content,
-        "chat_id":1
-      }
-    });  
+      // Écoute de l'événement 'message' de Socket.io
+      socket.on('sendMsg', (message) => {
+            console.log('Nouveau message : ' + message.content+' '+message.sender);
+            // Insertion du message dans la table de la base de données
+            axios({
+              method: 'post',
+              url: 'ISIMM_eCampus/public/api/enseignant/contacter_admin',
+              headers: {
+                'Authorization': 'Bearer '+ message.access_token
+              },
+              data:{
+                "text":message.content,
+                "chat_id":message.chat_id
+              }
+        });  
 
-    messages.push(msg);
-    io.to(channelName).emit('SendMsgServer', {...msg, type: "otherMsg"}); // utilisez le même type que celui du message reçu
-  });
+        messages.push(message.content);
+        io.to(channelName).emit('SendMsgServer', {...message.content, type: "otherMsg"}); // utilisez le même type que celui du message reçu
+      });
 });
 
 // Démarrage du serveur Socket.io
-io.listen(3000); 
+io.listen(4000);
